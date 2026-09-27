@@ -1,0 +1,1873 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f2f5f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1513" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="톡톡 번역기">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>톡톡 번역기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f2f5f4; --paper:#ffffff; --ink:#17231f; --muted:#5b6b66; --line:#dbe3e0;
+  --accent:#0f7a62; --accent-ink:#ffffff; --accent-soft:#e2f2ed;
+  --cur:#fff4c2; --err:#b3261e; --shadow:0 10px 40px rgba(23,35,31,.14);
+  --serif:"Literata",Georgia,"Times New Roman",serif;
+  --sans:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0f1513; --paper:#17201d; --ink:#e4ece9; --muted:#97a8a2; --line:#28342f;
+    --accent:#4fd1ad; --accent-ink:#0b1411; --accent-soft:#16312a; --cur:#3b3510; --err:#ff8a80; --shadow:0 10px 40px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0f1513; --paper:#17201d; --ink:#e4ece9; --muted:#97a8a2; --line:#28342f;
+  --accent:#4fd1ad; --accent-ink:#0b1411; --accent-soft:#16312a; --cur:#3b3510; --err:#ff8a80; --shadow:0 10px 40px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;padding-inline:16px;margin:0}
+[hidden]{display:none!important}
+.wrap{max-width:var(--wrapmax,1000px);margin:0 auto;padding-block:20px 140px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+h1{font-family:var(--serif);font-weight:600;font-size:1.5rem;margin:0}
+h1 small{display:block;font-family:var(--sans);font-weight:400;font-size:.8rem;color:var(--muted)}
+.tabbar{overflow-x:auto;scrollbar-width:none;margin:0 -16px 16px;padding:0 16px}
+.tabbar::-webkit-scrollbar{display:none}
+.tabs{display:inline-flex;min-width:max-content;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:500 .9rem var(--sans);padding:6px 16px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.tabs .cnt{font:500 .72rem var(--mono);margin-left:3px}
+button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible,.src:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.page{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px 22px 26px}
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);font:500 .9rem var(--sans);padding:9px 16px;border-radius:10px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.stop{background:var(--err);border-color:var(--err);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.muted{color:var(--muted);font-size:.85rem}
+.note{font-size:.8rem;color:var(--muted);margin:10px 0 0;line-height:1.55}
+.note.warn{color:var(--err)}
+.linkbtn{border:0;background:transparent;color:var(--accent);font:500 .8rem var(--sans);cursor:pointer;padding:2px 0}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font:500 .82rem var(--sans);padding:5px 12px;border-radius:7px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:500 .82rem var(--sans);padding:6px 12px;border-radius:999px;cursor:pointer}
+.pill .dotc{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.pill .dotc.off{background:var(--err)}
+select,.sel{font:500 .85rem var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+
+/* settings */
+.settings{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:18px}
+.settings h2{font:600 1rem var(--sans);margin:0 0 4px}
+.settings hr{border:0;border-top:1px solid var(--line);margin:18px 0 4px}
+.provs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0}
+.prov{display:flex;flex-direction:column;gap:2px;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px 12px;cursor:pointer;font:500 .9rem var(--sans)}
+.prov small{font-weight:400;font-size:.72rem;color:var(--muted)}
+.prov[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+.fields{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:640px){.fields{grid-template-columns:1fr 1fr}.fields .full{grid-column:1/-1}}
+.fields label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted)}
+.fields input{font:16px var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+
+/* translate controls */
+.ctrl{display:grid;gap:12px;margin-bottom:16px}
+.crow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.crow > label,.clabel{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.ctxbox{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.ctxbox input[type=range]{width:140px;accent-color:var(--accent)}
+.ctxbox output{font:500 .85rem var(--mono);color:var(--ink);min-width:3.2em;font-variant-numeric:tabular-nums}
+.ctxbox input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:5;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+@media (max-width:600px){.actions{padding:8px;gap:6px}.actions .btn{padding:8px 12px;font-size:.85rem}.prog{margin-left:0;width:100%}.prog .bar{flex:1}}
+.prog{margin-left:auto;display:flex;align-items:center;gap:10px;font:500 .8rem var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{width:120px;height:6px;border-radius:6px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0}
+.status{font-size:.82rem;color:var(--muted);min-height:1.2em}
+.status.warn{color:var(--err)}
+
+/* text */
+.doc{font-size:var(--fs,18px);line-height:var(--lh,1.75)}
+.eg{font:500 .7rem var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.pair{display:grid;gap:4px;padding:10px 12px;margin:0 -12px;border-radius:10px;border-left:3px solid transparent}
+.pair.pstart{margin-top:.9em}
+.pair.cur{background:var(--cur);border-left-color:var(--accent)}
+.pair.ctx{border-left-color:var(--line)}
+.src{font-family:var(--serif);cursor:pointer;overflow-wrap:anywhere}
+.src .n{font:500 .62em var(--mono);color:var(--muted);margin-right:.5em;vertical-align:.15em;user-select:none}
+.dst{font-family:var(--sans);font-size:.92em;color:var(--ink);overflow-wrap:anywhere;display:flex;gap:8px;align-items:flex-start}
+.dst .t{flex:1;min-width:0;white-space:pre-wrap;border-radius:6px;outline:none}
+.dst .t[contenteditable="true"]{background:var(--paper);box-shadow:0 0 0 2px var(--accent);padding:2px 6px}
+.dst .t.empty{color:var(--muted);font-size:.9em}
+.dst .t.busy{color:var(--muted)}
+.dst .tools{display:flex;gap:2px;flex:none;opacity:.55}
+.pair:hover .dst .tools,.pair.cur .dst .tools{opacity:1}
+.dst .tools button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:.85rem;padding:2px 5px;border-radius:6px}
+.dst .tools button:hover{background:var(--accent-soft);color:var(--accent)}
+.doc.only-dst .src{display:none}
+.doc.only-src .dst{display:none}
+.doc.only-dst .pair{padding-block:4px}
+
+/* view panel */
+.viewpanel{display:grid;gap:12px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.vrow{display:grid;grid-template-columns:5em minmax(0,1fr);gap:10px;align-items:center}
+.vrow > span{font-size:.85rem;color:var(--muted)}
+.vrow input[type=range]{width:100%;accent-color:var(--accent)}
+
+/* input page */
+.pagehead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.pagehead h2{font:600 1.05rem var(--sans);margin:0}
+.drop{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border:2px dashed var(--line);border-radius:12px;padding:14px 16px;background:var(--bg)}
+.drop b{display:block;font-size:.95rem}
+.drop span{font-size:.8rem;color:var(--muted)}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.8rem;margin:18px 0 10px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.urlrow{display:flex;gap:8px;margin-top:6px}
+.urlrow input{flex:1;min-width:0;font:16px var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+textarea#src{width:100%;min-height:240px;resize:vertical;font:max(16px,1rem)/1.7 var(--serif);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:6px}
+
+/* library */
+.slist{list-style:none;margin:0;padding:0;display:grid}
+.sitem{display:flex;align-items:stretch;border-top:1px solid var(--line)}
+.sitem:first-child{border-top:0}
+.sopen{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;background:transparent;border:0;color:var(--ink);padding:12px 4px;cursor:pointer;font:inherit}
+.stitle{font-family:var(--serif);overflow-wrap:anywhere}
+.ssub{font-size:.82rem;color:var(--muted)}
+.badge{font:500 .68rem var(--mono);color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:1px 6px;margin-left:6px}
+.sdel{flex:none;border:0;background:transparent;color:var(--muted);font-size:1.2rem;padding:0 10px;cursor:pointer}
+.sdel:hover{color:var(--err)}
+.empty{color:var(--muted);font-size:.9rem}
+.expanel{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.more{display:grid;gap:8px;margin-top:4px;padding:10px 12px;background:var(--paper);border:1px solid var(--line);border-radius:10px;font-family:var(--sans);font-size:.88rem}
+.more .row{margin-top:0}
+.more .btn{padding:6px 12px;font-size:.82rem}
+.alt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:8px 10px;cursor:pointer;font:inherit}
+.alt:hover{border-color:var(--accent)}
+.alt small{display:block;color:var(--muted);font-size:.75rem}
+.rv{font-family:var(--sans);font-size:.85em;border-left:3px solid #e0a800;background:rgba(224,168,0,.08);border-radius:0 8px 8px 0;padding:8px 10px;display:grid;gap:6px}
+.rv .fix{color:var(--ink)}
+.rv .row{margin-top:0}
+.rv .btn{padding:5px 10px;font-size:.8rem}
+.pair.flag .src .n::after{content:" ⚠";color:#c98a00}
+.panel{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.panel textarea{width:100%;min-height:130px;resize:vertical;font:14px/1.55 var(--sans);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px}
+.kbd{font:500 .75rem var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:var(--paper)}
+.tmhit{font:500 .68rem var(--mono);color:var(--accent);margin-left:6px}
+.rail{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;flex-direction:column;gap:8px}
+.rail button{width:52px;height:52px;border-radius:14px;border:1px solid var(--line);background:var(--paper);color:var(--ink);box-shadow:var(--shadow);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;font:inherit}
+.rail button span{font-size:1.1rem;line-height:1}
+.rail button small{font-size:.6rem;color:var(--muted);line-height:1.1}
+.rail button:hover{border-color:var(--accent)}
+.rail button:disabled{opacity:.45;cursor:default}
+#railLive{border-color:var(--accent)}
+#railLive span{color:var(--accent);animation:spin 1.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pair.pulse{animation:pulse 1.3s ease}
+@keyframes pulse{0%{box-shadow:0 0 0 0 var(--accent)}30%{box-shadow:0 0 0 4px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+@media (min-width:1200px){.rail{bottom:auto;top:50%;transform:translateY(-50%)}}
+@media (max-width:1199px){.doc{padding-right:52px}}
+@media (max-width:700px){.rail{right:6px;gap:6px}.rail button{width:44px;height:44px;border-radius:12px}.rail button small{font-size:.55rem}.doc{padding-right:40px}}
+.src .w{cursor:pointer;border-radius:4px;padding:0 1px}
+.src .w:hover{background:var(--accent-soft)}
+.src .w.on{background:#ffe766;color:#17231f}
+.doc.notap .src .w{cursor:inherit;padding:0}
+.doc.notap .src .w:hover{background:none}
+.dst .t.empty{cursor:pointer}
+.wcard{position:fixed;z-index:40;background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px 12px;max-width:calc(100vw - 24px);font-family:var(--sans)}
+.wcard.sheet{left:0!important;right:0;bottom:0;top:auto!important;width:auto!important;max-width:none;border-radius:16px 16px 0 0;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.wcard .wx{position:absolute;right:8px;top:6px;border:0;background:transparent;color:var(--muted);font-size:1.2rem;cursor:pointer}
+.wcard .wh{font-family:var(--serif);font-size:1.35rem;font-weight:600;padding-right:24px;overflow-wrap:anywhere}
+.wcard .wm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:2px 0 6px}
+.wcard .pos{font-size:.72rem;font-weight:500;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:1px 8px}
+.wcard .pron{font:.8rem var(--mono);color:var(--muted)}
+.wcard .wmean{font-weight:700;font-size:1.02rem;margin-bottom:4px}
+.wcard .row{margin-top:8px}
+.wcard .btn{padding:5px 10px;font-size:.8rem}
+.toasts{position:fixed;z-index:35;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 16px);display:grid;gap:8px;width:min(360px,calc(100vw - 28px))}
+@media (max-width:700px){.toasts{bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:12px;right:60px;width:auto}}
+.toast{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:10px 12px;display:grid;gap:6px;font-size:.88rem}
+.toast.error{border-left-color:var(--err)}
+.toast.error b{color:var(--err)}
+.toast .th{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.toast .tx{border:0;background:transparent;color:var(--muted);font-size:1.1rem;cursor:pointer}
+.toast .row{margin-top:2px}
+.toast .btn{padding:5px 10px;font-size:.8rem}
+.viewer{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.35);display:flex;justify-content:flex-end}
+.vbox{background:var(--bg);width:min(760px,100%);height:100%;display:flex;flex-direction:column;box-shadow:var(--shadow);padding-top:env(safe-area-inset-top,0px)}
+.vhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--paper)}
+.vt{font-family:var(--serif);font-weight:600;font-size:1.1rem}
+.vbody{flex:1;overflow:auto;padding:12px 30px calc(30px + env(safe-area-inset-bottom,0px)) 30px}
+body.noscroll{overflow:hidden}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:16px}
+.mbox{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px 20px;width:min(440px,100%);display:grid;gap:10px}
+.mbox h3{margin:0;font:600 1.05rem var(--sans)}
+.mbox input{font:16px var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
+.libtools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;padding:8px 10px;background:var(--bg);border:1px solid var(--line);border-radius:10px}
+.pick{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);cursor:pointer;padding:0 6px}
+.pick input{width:17px;height:17px;accent-color:var(--accent);margin:0}
+.sitem .pick{align-self:center}
+.sdel.view{font-size:1rem}
+@media (prefers-reduced-motion:reduce){#railLive span,.pair.pulse{animation:none}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <h1>톡톡 번역기<small>문맥을 이어 가며 한 문장씩, 또는 한 번에 번역해요</small></h1>
+    <button class="pill" id="aiBtn" aria-expanded="false" aria-controls="settings"><span class="dotc" id="aiDot"></span>설정 <span id="aiName" class="muted" style="font-size:.78rem"></span></button>
+  </header>
+  <div class="tabbar">
+    <div class="tabs" role="tablist">
+      <button id="tabRead" role="tab" aria-selected="true">번역</button>
+      <button id="tabEdit" role="tab" aria-selected="false">글 넣기</button>
+      <button id="tabLib" role="tab" aria-selected="false">글 목록<span class="cnt" id="libCount"></span></button>
+    </div>
+  </div>
+
+  <section class="settings" id="settings" hidden>
+    <h2>AI 선택</h2>
+    <div class="muted">번역할 AI를 골라요. API 키는 이 브라우저에만 저장되고, 고른 AI 회사로만 전송돼요.</div>
+    <div class="provs" id="provs"></div>
+    <div class="fields" id="fields">
+      <label class="full" id="fBase">API 주소 (Base URL)<input id="inBase" placeholder="https://openrouter.ai/api/v1" autocomplete="off"></label>
+      <label id="fKey">API 키<input id="inKey" type="password" placeholder="sk-..." autocomplete="off"></label>
+      <label id="fModel">모델 이름<input id="inModel" autocomplete="off"></label>
+    </div>
+    <p class="note" id="provNote"></p>
+    <hr>
+    <h2>번역 방식</h2>
+    <div class="crow" style="margin-top:8px">
+      <label>문체 <select id="styleSel">
+        <option value="natural">자연스럽게 (의역 허용)</option>
+        <option value="faithful">원문에 충실하게 (직역에 가깝게)</option>
+        <option value="literary">문학적으로 (소설·대사 느낌 살리기)</option>
+      </select></label>
+    </div>
+    <label class="full" style="display:grid;gap:4px;margin-top:10px;font-size:.8rem;color:var(--muted)">용어·인물 메모 (선택) — 이름 표기나 호칭 규칙을 적어 두면 번역할 때마다 참고해요
+      <textarea id="glossary" rows="3" style="font:14px/1.5 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical" placeholder="예) Hinako → 히나코 / Matsumoto-sensei → 마츠모토 선생님 / 반말로 번역"></textarea>
+    </label>
+    <div class="row" style="margin-top:16px">
+      <button class="btn primary" id="saveAI">저장하고 닫기</button>
+      <button class="btn" id="testAI">연결 테스트</button>
+      <span class="muted" id="testOut"></span>
+    </div>
+  </section>
+
+  <main>
+    <section class="page" id="readView">
+      <div class="ctrl">
+        <div class="crow">
+          <label>원문 <select id="langSel" aria-label="원문 언어"></select></label>
+          <span class="muted">→</span>
+          <label>번역 <select id="tgtSel" aria-label="번역할 언어"></select></label>
+          <span class="ctxbox">
+            <input type="checkbox" id="ctxOn" aria-label="앞 문맥 참고">
+            <label for="ctxOn" style="cursor:pointer">앞 문맥</label>
+            <input type="range" id="ctxN" min="1" max="20" step="1" aria-label="참고할 앞 문장 수">
+            <output id="ctxOut"></output>
+          </span>
+          <label>보기
+            <span class="seg" id="showSeg"><button data-v="both">원문+번역</button><button data-v="dst">번역만</button><button data-v="src">원문만</button></span>
+          </label>
+          <label class="clabel" title="원문 단어를 누르면 뜻을 보여줘요"><input type="checkbox" id="wordTap" style="accent-color:var(--accent);width:16px;height:16px;margin:0"> 단어 뜻</label>
+          <button class="linkbtn" id="glossBtn" aria-expanded="false" aria-controls="glossPanel">📖 용어집</button>
+          <button class="linkbtn" id="viewBtn" aria-expanded="false" aria-controls="viewPanel">글자 크기 · 단축키</button>
+        </div>
+        <div class="viewpanel" id="viewPanel" hidden>
+          <div class="vrow"><span>글자 크기</span><input type="range" id="fsRange" min="14" max="30" step="1" aria-label="글자 크기"></div>
+          <div class="vrow"><span>줄 간격</span><input type="range" id="lhRange" min="1.3" max="2.6" step="0.1" aria-label="줄 간격"></div>
+          <div class="vrow"><span>화면 폭</span><span class="seg" id="pwSeg"><button data-pw="normal">보통</button><button data-pw="wide">넓게</button><button data-pw="full">꽉 차게</button></span></div>
+          <p class="note" style="margin:0">단축키: <span class="kbd">Enter</span> 표시된 문장 번역 · <span class="kbd">↑</span><span class="kbd">↓</span> 문장 이동 · <span class="kbd">N</span> 다음 미번역 문장 · <span class="kbd">R</span> 다음 검토 항목</p>
+        </div>
+        <div class="panel" id="glossPanel" hidden>
+          <div class="muted">이 글의 용어집이에요. 인물 이름, 지명, 반복되는 용어의 번역 표기를 적어 두면 모든 번역에 적용돼요. (설정의 공통 메모도 함께 적용돼요)</div>
+          <textarea id="docGloss" spellcheck="false" placeholder="예) Hinako → 히나코 (주인공, 고등학생)&#10;Ms. Matsumoto → 마츠모토 선생님 (담임)"></textarea>
+          <div class="row" style="margin-top:0">
+            <button class="btn primary" id="glossAuto">AI로 용어 뽑기</button>
+            <span class="muted" id="glossMsg"></span>
+          </div>
+        </div>
+        <div class="actions">
+          <span class="seg" id="modeSeg" aria-label="한 문장씩 번역 방식"><button data-m="manual">한 문장씩 · 수동</button><button data-m="auto">한 문장씩 · 자동</button></span>
+          <button class="btn primary" id="stepBtn">다음 문장 번역</button>
+          <button class="btn" id="allBtn">전체 일괄 번역</button>
+          <button class="btn" id="reviewBtn">✔ 번역 검토</button>
+          <button class="btn" id="exportBtn" aria-expanded="false" aria-controls="exportPanel">⬇ 저장</button>
+          <div class="prog"><span id="progTxt"></span><span class="bar"><i id="progBar"></i></span></div>
+        </div>
+        <div class="expanel" id="exportPanel" hidden>
+          <div class="muted">지금 글의 번역을 파일로 내려받아요.</div>
+          <div class="row" style="margin-top:0">
+            <button class="btn primary" data-ex="tr">번역만 (.txt)</button>
+            <button class="btn" data-ex="both">원문 + 번역 (.txt)</button>
+            <button class="btn" data-ex="csv">표 (.csv · 엑셀)</button>
+          </div>
+          <p class="note" id="exMsg" style="margin:0"></p>
+        </div>
+        <div class="status" id="status" aria-live="polite"></div>
+      </div>
+      <div class="eg" id="egLabel">예문 · ‘글 넣기’에서 번역할 글을 넣으세요</div>
+      <div class="doc" id="doc"></div>
+    </section>
+
+    <section class="page" id="editView" hidden>
+      <div class="pagehead"><h2>글 넣기</h2>
+        <label class="clabel">원문 언어 <select id="srcLang"><option value="">자동 감지</option></select></label>
+      </div>
+      <div class="drop" id="dropZone">
+        <div><b>문서 파일 올리기</b><span>TXT · PDF · Word(DOCX) · EPUB · 자막(SRT·VTT) · HTML · Markdown — 끌어다 놓아도 돼요</span></div>
+        <button class="btn primary" id="fileBtn">파일 선택</button>
+        <input type="file" id="fileIn" multiple hidden accept=".txt,.text,.md,.markdown,.pdf,.docx,.epub,.srt,.vtt,.html,.htm,text/plain,application/pdf">
+      </div>
+      <p class="note" id="fileMsg" aria-live="polite">긴 문서는 약 2만5천 자씩 나눠서 글 목록에 넣어요.</p>
+      <div class="or"><span>또는 주소로 가져오기</span></div>
+      <div class="urlrow">
+        <input id="urlIn" type="url" inputmode="url" placeholder="https://…" autocomplete="off" spellcheck="false">
+        <button class="btn primary" id="urlGo">글 가져오기</button>
+      </div>
+      <p class="note" id="urlMsg">주소를 넣으면 광고·메뉴는 빼고 본문만 가져와요.</p>
+      <div class="or"><span>또는 직접 붙여 넣기</span></div>
+      <textarea id="src" spellcheck="false" aria-label="번역할 글"></textarea>
+      <div class="row">
+        <button class="btn primary" id="go">새 글로 추가하고 번역하기</button>
+        <button class="btn" id="clear">지우기</button>
+        <span class="muted" id="count"></span>
+      </div>
+    </section>
+
+    <section class="page" id="libView" hidden>
+      <div class="pagehead"><h2>글 목록</h2><button class="btn" id="libNew">+ 새 글</button></div>
+      <div class="libtools" id="libTools">
+        <label class="pick"><input type="checkbox" id="pickAll" aria-label="전체 선택"><span id="pickCount">전체 선택</span></label>
+        <button class="btn" id="bulkSave" disabled>⬇ 선택한 글 저장</button>
+        <button class="btn" id="bulkDel" disabled>선택 삭제</button>
+      </div>
+      <div class="expanel" id="bulkPanel" hidden style="margin-bottom:12px">
+        <div class="crow">
+          <label>내용 <select id="bulkKind"><option value="tr">번역만</option><option value="both">원문 + 번역</option><option value="csv">표 (.csv · 엑셀)</option></select></label>
+          <label>묶는 방식 <select id="bulkPack"><option value="zip">글마다 파일로 (ZIP 한 개)</option><option value="one">한 파일로 합치기</option></select></label>
+          <button class="btn primary" id="bulkGo">저장</button>
+        </div>
+        <p class="note" id="bulkMsg" style="margin:0"></p>
+      </div>
+      <ul class="slist" id="libList"></ul>
+      <p class="empty" id="libEmpty" hidden>아직 넣은 글이 없어요.</p>
+      <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:16px">
+        <h2 style="font:600 1rem var(--sans);margin:0 0 6px">백업 · 불러오기</h2>
+        <p class="note" style="margin-top:0">글과 번역은 이 기기의 브라우저(또는 PC 프로그램) 안에만 저장돼요. 가끔 백업 파일로 보관해 두세요. 다른 기기에서 불러오면 글과 번역이 그대로 옮겨져요.</p>
+        <div class="row">
+          <button class="btn primary" id="bkSave">백업 파일로 저장</button>
+          <button class="btn" id="bkOpen">백업 파일 불러오기</button>
+          <input type="file" id="bkFile" accept=".json,application/json" hidden>
+        </div>
+        <p class="note" id="bkMsg" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toasts" id="toasts" aria-live="assertive"></div>
+<div class="wcard" id="wcard" hidden role="dialog" aria-label="단어 뜻"><button class="wx" id="wcClose" aria-label="닫기">×</button><div id="wcBody"></div></div>
+<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="vwTitle">
+  <div class="vbox">
+    <div class="vhead">
+      <div><div class="vt" id="vwTitle"></div><div class="muted" id="vwMeta"></div></div>
+      <div class="row" style="margin-top:0">
+        <button class="btn" id="vwSave">⬇ 번역 저장</button>
+        <button class="btn" id="vwOpen">이 글 열어서 번역</button>
+        <button class="btn" id="vwClose" aria-label="보기 창 닫기">닫기</button>
+      </div>
+    </div>
+    <div class="doc vbody" id="vwBody"></div>
+  </div>
+</div>
+<div class="modal" id="saveModal" hidden role="dialog" aria-modal="true" aria-labelledby="saveTitle">
+  <div class="mbox">
+    <h3 id="saveTitle">다른 이름으로 저장</h3>
+    <label style="display:grid;gap:4px;font-size:.85rem;color:var(--muted)">파일 이름<input id="saveName" autocomplete="off" spellcheck="false"></label>
+    <p class="note" style="margin:0">이 브라우저는 저장 위치를 고르는 창을 지원하지 않아서 이름만 정해요. 파일은 다운로드 폴더에 저장돼요.</p>
+    <div class="row" style="margin-top:4px"><button class="btn primary" id="saveOk">저장</button><button class="btn" id="saveCancel">취소</button></div>
+  </div>
+</div>
+<nav class="rail" id="rail" aria-label="바로가기">
+  <button id="railTop" title="맨 위로" aria-label="맨 위로"><span>⤒</span><small>맨 위</small></button>
+  <button id="railBack" title="방금 읽던 문장으로" aria-label="방금 읽던 문장으로"><span>📍</span><small>읽던 곳</small></button>
+  <button id="railLive" title="지금 번역 중인 문장으로" aria-label="지금 번역 중인 문장으로" hidden><span>⟳</span><small>번역 중</small></button>
+</nav>
+
+<script>
+(() => {
+  const SAMPLE = `Hinako closed the classroom door quietly and sat down at her desk. "You're late again," Ms. Matsumoto said without looking up from her papers. "I missed the train," Hinako answered. She knew it was a poor excuse, and her teacher knew it too.
+Outside, the rain kept falling on the empty schoolyard. Ms. Matsumoto finally raised her head. "Then take an earlier one tomorrow," she said, and for the first time that morning, she smiled.`;
+
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+    set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
+  };
+  const pad = n => String(n).padStart(2, "0");
+  function el(tag, cls, txt){ const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+  function fmtDate(t){ const d = new Date(t); return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+  const inArtifact = !!(window.claude && typeof window.claude.use === "function");
+  let samplePromise = null;
+  function getSample(){
+    if(!samplePromise) samplePromise = inArtifact ? window.claude.use("sample").catch(() => null) : Promise.resolve(null);
+    return samplePromise;
+  }
+  if(inArtifact) getSample();
+  const doc = $("doc");
+  // ---------- languages ----------
+  const LANGS = {
+    en:{ name:"영어", tts:"en-US" }, ja:{ name:"일본어", tts:"ja-JP", nospace:true }, zh:{ name:"중국어", tts:"zh-CN", nospace:true },
+    es:{ name:"스페인어", tts:"es-ES" }, fr:{ name:"프랑스어", tts:"fr-FR" }, de:{ name:"독일어", tts:"de-DE" }, it:{ name:"이탈리아어", tts:"it-IT" },
+    pt:{ name:"포르투갈어", tts:"pt-BR" }, ru:{ name:"러시아어", tts:"ru-RU" }, vi:{ name:"베트남어", tts:"vi-VN" }, th:{ name:"태국어", tts:"th-TH", nospace:true },
+    id:{ name:"인도네시아어", tts:"id-ID" }, tr:{ name:"튀르키예어", tts:"tr-TR" }, nl:{ name:"네덜란드어", tts:"nl-NL" }, pl:{ name:"폴란드어", tts:"pl-PL" },
+    sv:{ name:"스웨덴어", tts:"sv-SE" }, uk:{ name:"우크라이나어", tts:"uk-UA" }, el:{ name:"그리스어", tts:"el-GR" }, hi:{ name:"힌디어", tts:"hi-IN" },
+    ar:{ name:"아랍어", tts:"ar-SA", rtl:true }, he:{ name:"히브리어", tts:"he-IL", rtl:true }, fa:{ name:"페르시아어", tts:"fa-IR", rtl:true },
+    tl:{ name:"필리핀어", tts:"fil-PH" }, ko:{ name:"한국어", tts:"ko-KR" }, other:{ name:"외국어", tts:"" }
+  };
+  const PRON_HINT = { ja:"읽는 법 (히라가나 + 로마자)", zh:"병음 (성조 표시)", th:"발음 (로마자 + 한글 표기)", ru:"발음 (강세 표시 + 한글 표기)", uk:"발음 (로마자 + 한글 표기)",
+    ar:"발음 (로마자 + 한글 표기)", he:"발음 (로마자 + 한글 표기)", fa:"발음 (로마자 + 한글 표기)", hi:"발음 (로마자 + 한글 표기)", el:"발음 (로마자 + 한글 표기)", ko:"로마자 표기" };
+  const STOP = {
+    en:"the and is are of to in that it you was for with this have", es:"el la los las de que y en un una es por con para del", fr:"le la les des et est un une que dans pour pas avec du",
+    de:"der die das und ist nicht ein eine mit zu den von ich sich", it:"il lo la gli le di che e è un una per non con del", pt:"o a os as de que e é um uma não com para em do",
+    nl:"de het een en is van dat niet op met zijn", id:"yang dan di ini itu dengan untuk tidak dari akan", tr:"bir ve bu da de için ile çok ne",
+    pl:"i w nie na się że jest do z to", sv:"och att det som en är på för med av", vi:"và của là có không những một người được các", tl:"ang ng mga sa na at ay ito si"
+  };
+  function detectLang(t){
+    const s = String(t || "").slice(0, 3000);
+    const cnt = re => (s.match(re) || []).length;
+    const letters = cnt(/\p{L}/gu) || 1;
+    const share = re => cnt(re) / letters;
+    if(cnt(/[぀-ヿ]/g) > 3) return "ja";
+    if(share(/\p{Script=Hangul}/gu) > .3) return "ko";
+    if(share(/\p{Script=Han}/gu) > .3) return "zh";
+    if(share(/\p{Script=Thai}/gu) > .3) return "th";
+    if(share(/\p{Script=Hebrew}/gu) > .3) return "he";
+    if(share(/\p{Script=Arabic}/gu) > .3) return /[پچژگ]/.test(s) ? "fa" : "ar";
+    if(share(/\p{Script=Devanagari}/gu) > .3) return "hi";
+    if(share(/\p{Script=Greek}/gu) > .3) return "el";
+    if(share(/\p{Script=Cyrillic}/gu) > .3) return /[іїєґ]/i.test(s) ? "uk" : "ru";
+    if(cnt(/[ăđơưạảãặẳẵằắậẩẫầấẹẻẽệểễềếịỉĩọỏõộổỗồốợởỡờớụủũựửữừứỵỷỹỳ]/gi) > 3) return "vi";
+    const words = " " + s.toLowerCase().replace(/[^\p{L}\s]/gu, " ").replace(/\s+/g, " ") + " ";
+    let best = "en", score = 0;
+    for(const [code, list] of Object.entries(STOP)){
+      let n = 0; list.split(" ").forEach(w => { n += words.split(" " + w + " ").length - 1; });
+      if(n > score){ score = n; best = code; }
+    }
+    return best;
+  }
+  const L_ = code => LANGS[code] || LANGS.other;
+  const langName = code => L_(code).name;
+  const segCache = {};
+  function seg(lang, g){
+    const k = lang + "|" + g;
+    if(!(k in segCache)){ try{ segCache[k] = typeof Intl !== "undefined" && Intl.Segmenter ? new Intl.Segmenter(lang === "other" ? undefined : lang, { granularity:g }) : null; }catch(e){ segCache[k] = null; } }
+    return segCache[k];
+  }
+  // Word positions in a sentence, for any language (spaceless languages like Japanese use the browser's dictionary).
+  function wordsOf(s, lang){
+    const out = [], sg = seg(lang, "word");
+    if(sg){
+      for(const x of sg.segment(s)) if(x.isWordLike && !/^\p{N}+$/u.test(x.segment)) out.push({ w:x.segment, o:x.index });
+      return out;
+    }
+    const re = L_(lang).nospace ? /[\p{L}\p{M}]/gu : /[\p{L}\p{M}]+(?:['’\-][\p{L}\p{M}]+)*/gu;
+    let m; while((m = re.exec(s))) out.push({ w:m[0], o:m.index });
+    return out;
+  }
+  const isLetter = ch => !!ch && /[\p{L}\p{M}]/u.test(ch);
+  const SAMPLES = {
+    ja:"毎朝、駅まで歩いて行きます。途中で小さなパン屋に寄って、焼きたてのパンを買うのが楽しみです。雨の日は少し面倒ですが、それでも歩くことにしています。",
+    es:"Cada mañana camino hasta la estación. Por el camino, me gusta pasar por una pequeña panadería y comprar pan recién hecho. Aunque llueva, prefiero ir andando.",
+    zh:"我每天早上走路去车站。路上我喜欢去一家小面包店，买刚出炉的面包。下雨的时候有点麻烦，但我还是坚持走路。",
+    fr:"Chaque matin, je vais à pied jusqu'à la gare. En chemin, j'aime m'arrêter dans une petite boulangerie pour acheter du pain frais. Même quand il pleut, je préfère marcher.",
+    de:"Jeden Morgen gehe ich zu Fuß zum Bahnhof. Unterwegs halte ich gern bei einer kleinen Bäckerei an und kaufe frisches Brot. Auch wenn es regnet, gehe ich lieber zu Fuß."
+  };
+
+  // ---------- AI providers ----------
+  const PROVIDERS = {
+    builtin:   { name:"Claude (claude.ai)", sub:"키 필요 없음 · claude.ai에서만", key:false, model:false },
+    openai:    { name:"OpenAI", sub:"ChatGPT의 GPT 모델", model:"gpt-4.1-mini", keyPh:"sk-...", keyUrl:"platform.openai.com/api-keys" },
+    gemini:    { name:"Google Gemini", sub:"무료 사용량 있음", model:"gemini-2.5-flash", keyPh:"AIza...", keyUrl:"aistudio.google.com/apikey" },
+    anthropic: { name:"Claude API", sub:"Anthropic API 키", model:"claude-haiku-4-5-20251001", keyPh:"sk-ant-...", keyUrl:"console.anthropic.com" },
+    compat:    { name:"OpenAI 호환", sub:"OpenRouter · Groq · DeepSeek · Ollama", model:"", keyPh:"키 (Ollama는 비워도 됨)", base:true },
+  };
+  const cfg = Object.assign({ provider: inArtifact ? "builtin" : "gemini", keys:{}, models:{}, base:"https://openrouter.ai/api/v1" }, store.get("tr_ai", {}));
+  if(!PROVIDERS[cfg.provider]) cfg.provider = "gemini";
+  cfg.keys = cfg.keys || {}; cfg.models = cfg.models || {};
+  function modelOf(p){ return (cfg.models[p] || PROVIDERS[p].model || "").trim(); }
+  function ready(){
+    const p = cfg.provider;
+    if(p === "builtin") return inArtifact;
+    if(p === "compat") return !!(cfg.base && modelOf(p));
+    return !!cfg.keys[p];
+  }
+  function updateAIButton(){
+    $("aiName").textContent = "· " + PROVIDERS[cfg.provider].name;
+    $("aiDot").classList.toggle("off", !ready());
+  }
+
+  async function readSSE(res, onData){
+    const rd = res.body.getReader(), dec = new TextDecoder();
+    let buf = "";
+    for(;;){
+      const { value, done } = await rd.read();
+      if(done) break;
+      buf += dec.decode(value, { stream:true });
+      let i;
+      while((i = buf.indexOf("\n")) >= 0){
+        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+        if(!line.startsWith("data:")) continue;
+        const payload = line.slice(5).trim();
+        if(!payload || payload === "[DONE]") continue;
+        try{ onData(JSON.parse(payload)); }catch(e){}
+      }
+    }
+  }
+  async function postStream(url, headers, bodyObj, signal){
+    let res;
+    try{ res = await fetch(url, { method:"POST", headers, body:JSON.stringify(bodyObj), signal }); }
+    catch(e){ if(e && e.name === "AbortError") throw { code:"cancelled" }; throw { code:"blocked" }; }
+    if(!res.ok){
+      let data = null; try{ data = await res.json(); }catch(e){}
+      if(Array.isArray(data)) data = data[0];
+      const msg = data && (data.error && (data.error.message || data.error) || data.message) || "";
+      const code = res.status === 401 || res.status === 403 ? "bad_key" : res.status === 429 ? "rate_limited" : res.status === 404 ? "bad_model" : "http";
+      throw { code, detail: typeof msg === "string" ? msg : JSON.stringify(msg), status: res.status };
+    }
+    return res;
+  }
+
+  // Streams an answer; onText(wholeTextSoFar) fires as text arrives. Thinking is turned off where possible.
+  let geminiNoThinkingOK = true;
+  async function streamAI(prompt, signal, onText, maxTokens){
+    const p = cfg.provider, model = modelOf(p), key = (cfg.keys[p] || "").trim();
+    let text = "";
+    const push = t => { if(!t) return; text += t; onText && onText(text); };
+    if(p === "builtin"){
+      const sample = await getSample();
+      if(!sample) throw { code:"noai" };
+      const r = await sample(prompt, { modelTier:"default", cache:false, signal, onText: u => { text = u.text; onText && onText(text); } });
+      return r.text;
+    }
+    if(p !== "compat" && !key) throw { code:"no_key" };
+    if(!model) throw { code:"bad_model" };
+    const sys = "You are a professional literary and technical translator. Translate faithfully and fluently, keep names and terms consistent with any context given, and output only the translation in the exact format asked.";
+    try{
+      if(p === "openai" || p === "compat"){
+        const base = p === "openai" ? "https://api.openai.com/v1" : cfg.base.replace(/\/+$/, "");
+        const headers = { "Content-Type":"application/json" };
+        if(key) headers.Authorization = "Bearer " + key;
+        const b = { model, stream:true, messages:[{role:"system",content:sys},{role:"user",content:prompt}] };
+        if(/^(gpt-5|o\d)/i.test(model)){ b.reasoning_effort = /^gpt-5/i.test(model) ? "minimal" : "low"; b.max_completion_tokens = maxTokens + 600; }
+        else b.max_tokens = maxTokens;
+        const res = await postStream(base + "/chat/completions", headers, b, signal);
+        await readSSE(res, d => push(d.choices && d.choices[0] && d.choices[0].delta && d.choices[0].delta.content));
+      } else if(p === "gemini"){
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`;
+        const headers = { "Content-Type":"application/json", "x-goog-api-key":key };
+        const gen = { maxOutputTokens: maxTokens, temperature: 0.3 };
+        if(geminiNoThinkingOK && /flash/i.test(model)) gen.thinkingConfig = { thinkingBudget: 0 };
+        const b = { systemInstruction:{parts:[{text:sys}]}, contents:[{role:"user",parts:[{text:prompt}]}], generationConfig:gen };
+        let res;
+        try{ res = await postStream(url, headers, b, signal); }
+        catch(e){
+          if(gen.thinkingConfig && e.code === "http" && /think/i.test(e.detail || "")){ geminiNoThinkingOK = false; delete gen.thinkingConfig; res = await postStream(url, headers, b, signal); }
+          else throw e;
+        }
+        await readSSE(res, d => { const parts = d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts || []; parts.forEach(x => { if(!x.thought) push(x.text); }); });
+      } else if(p === "anthropic"){
+        const res = await postStream("https://api.anthropic.com/v1/messages",
+          { "Content-Type":"application/json", "x-api-key":key, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" },
+          { model, max_tokens:maxTokens, stream:true, system:sys, messages:[{role:"user",content:prompt}] }, signal);
+        await readSSE(res, d => { if(d.type === "content_block_delta" && d.delta && d.delta.type === "text_delta") push(d.delta.text); });
+      }
+    }catch(e){
+      if(e && e.name === "AbortError") throw { code:"cancelled", text };
+      if(e && e.code) throw Object.assign(e, { text });
+      throw { code:"upstream_error", text };
+    }
+    if(!text.trim()) throw { code:"empty_completion" };
+    return text;
+  }
+
+  const ERR = {
+    not_granted: "AI 사용이 허용되지 않았어요. 페이지를 새로 열고 허용하면 다시 쓸 수 있어요.",
+    sampling_disabled: "이 계정에서는 AI를 쓸 수 없어요.",
+    rate_limited: "요청이 너무 많아요. 잠시 후 다시 눌러 주세요.",
+    session_expired: "로그인이 만료됐어요. 다시 로그인한 뒤 눌러 주세요.",
+    invalid_json: "AI 답을 정리하지 못했어요. 다시 시도해 주세요.",
+    refused: "이 내용은 번역할 수 없어요.",
+    noai: "이 주소에서는 Claude (claude.ai)를 쓸 수 없어요. 설정에서 다른 AI를 골라 주세요.",
+    no_key: "API 키가 없어요. 위의 설정에서 키를 넣어 주세요.",
+    bad_key: "API 키가 맞지 않거나 권한이 없어요. 설정에서 키를 확인해 주세요.",
+    bad_model: "모델 이름을 찾을 수 없어요. 설정에서 모델 이름을 확인해 주세요.",
+    empty_completion: "AI가 빈 답을 보냈어요. 다시 시도해 주세요.",
+  };
+  function errMsg(e){
+    const c = e && e.code;
+    if(c === "blocked") return inArtifact
+      ? "claude.ai 페이지 안에서는 외부 AI 호출이 막혀 있어요. 설정에서 'Claude (claude.ai)'를 고르거나, 직접 올린 웹앱에서 쓰세요."
+      : "AI 서버에 연결하지 못했어요. 인터넷 연결과 API 주소를 확인해 주세요.";
+    if(c === "http") return `AI 서버 오류 (${e.status})${e.detail ? ": " + e.detail.slice(0, 160) : ""}`;
+    if(ERR[c]) return ERR[c] + (e.detail && c !== "rate_limited" ? ` (${e.detail.slice(0, 120)})` : "");
+    return "번역하지 못했어요. 다시 시도해 주세요.";
+  }
+  const FIXABLE = ["noai","no_key","bad_key","bad_model","blocked","not_granted","sampling_disabled"];
+
+  // ---------- translation settings ----------
+  const SET_DEFAULT = { tgt:"ko", ctxOn:true, ctxN:5, mode:"manual", show:"both", style:"natural", gloss:"", wordTap:true };
+  let set = Object.assign({}, SET_DEFAULT, store.get("tx_set", {}));
+  set.ctxN = Math.min(20, Math.max(1, Math.round(+set.ctxN || 5)));
+  const saveSet = () => store.set("tx_set", set);
+  const STYLE = {
+    natural: "자연스럽고 매끄럽게, 뜻이 같다면 의역해도 된다",
+    faithful: "원문의 구조와 표현에 최대한 충실하게, 빠지는 내용 없이",
+    literary: "문학 번역처럼 인물의 말투·감정·분위기를 살려서"
+  };
+
+  // ---------- documents ----------
+  function makeTitle(t){ const s = String(t).trim().split(/\n/)[0]; return s.length > 70 ? s.slice(0, 70).replace(/\s+\S*$/, "") + "…" : s; }
+  function newDoc(text, title, src, lang){
+    return { id:"d" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: title || makeTitle(text), text, src: src || "", lang: lang || detectLang(text), at: Date.now(), tr:{}, cur:0 };
+  }
+  let docs = store.get("tx_docs", []); if(!Array.isArray(docs)) docs = [];
+  const sampleDoc = newDoc(SAMPLE, "예문", "", "en");
+  let curId = store.get("tx_cur", docs[0] ? docs[0].id : null);
+  function curDoc(){ return docs.find(d => d.id === curId) || sampleDoc; }
+  const isSample = () => curDoc() === sampleDoc;
+  function curLang(){ const d = curDoc(); return d.lang || (d.lang = detectLang(d.text)); }
+  function saveDocs(){
+    const ok = store.set("tx_docs", docs);
+    store.set("tx_cur", curId);
+    $("libCount").textContent = docs.length ? ` ${docs.length}` : "";
+    if(!ok) status("저장 공간이 부족해요. 글 목록에서 안 쓰는 글을 지워 주세요.", true);
+    return ok;
+  }
+  function addDoc(text, title, src, lang){
+    const d = newDoc(text, title, src, lang);
+    docs.unshift(d); curId = d.id; saveDocs();
+    return d;
+  }
+
+  // ---------- sentences ----------
+  function splitSentences(t, lang){
+    lang = lang || curLang();
+    const out = [], sg = seg(lang, "sentence");
+    String(t).replace(/\r/g, "").split(/\n+/).forEach((para, pi) => {
+      if(!para.trim()) return;
+      const parts = sg ? [...sg.segment(para)].map(x => x.segment) : (para.match(/[^.!?。！？؟।]+(?:[.!?。！？؟।]+["'”’)」』]*|$)/g) || []);
+      parts.forEach(x => { if(x.trim()) out.push({ s:x.trim(), para:pi }); });
+    });
+    return out;
+  }
+  let sentences = [];
+  const entry = i => { const r = curDoc().tr[i]; return r && sentences[i] && r.s === sentences[i].s && (!r.g || r.g === set.tgt) ? r : null; };
+  const trOf = i => { const r = entry(i); return r ? r.t : ""; };
+  function setTr(i, t, opt){
+    const old = entry(i), h = old ? (old.h || []).slice() : [];
+    if(old && old.t && old.t !== t && !(opt && opt.noHistory)){ h.push(old.t); while(h.length > 5) h.shift(); }
+    curDoc().tr[i] = { s: sentences[i].s, t, g: set.tgt, h, tm: !!(opt && opt.tm) };
+  }
+  // Translation memory: the same source sentence already translated (this or another text) is reused as is.
+  function tmIndex(){
+    const m = new Map();
+    [curDoc(), ...docs].forEach(d => Object.values(d.tr || {}).forEach(r => { if(r && r.t && r.s && (!r.g || r.g === set.tgt) && !m.has(r.s)) m.set(r.s, r.t); }));
+    return m;
+  }
+  const doneCount = () => sentences.reduce((n, o, i) => n + (trOf(i) ? 1 : 0), 0);
+
+  // ---------- rendering ----------
+  const rowOf = i => doc.querySelector(`.pair[data-i="${i}"]`);
+  const tOf = i => { const r = rowOf(i); return r ? r.querySelector(".t") : null; };
+  function status(t, warn){ const s = $("status"); s.textContent = t || ""; s.classList.toggle("warn", !!warn); }
+  function render(){
+    stopAll();
+    const d = curDoc(), lang = curLang(), L = L_(lang);
+    sentences = splitSentences(d.text, lang);
+    doc.textContent = "";
+    let last = -1;
+    sentences.forEach((o, i) => {
+      const pair = el("div", "pair" + (i > 0 && o.para !== last ? " pstart" : "")); pair.dataset.i = i; last = o.para;
+      const s = el("div", "src"); s.tabIndex = 0; s.setAttribute("role", "button"); s.lang = L.tts || lang; if(L.rtl) s.dir = "rtl";
+      s.append(el("span", "n", String(i + 1))); buildSrc(s, o.s, lang);
+      const dst = el("div", "dst"), t = el("div", "t"), tools = el("div", "tools");
+      t.lang = (L_(set.tgt).tts || set.tgt); if(L_(set.tgt).rtl) t.dir = "rtl";
+      const re = el("button", "", "↻"); re.dataset.act = "re"; re.title = "다시 번역"; re.setAttribute("aria-label", `${i+1}번 문장 다시 번역`);
+      const ed = el("button", "", "✎"); ed.dataset.act = "edit"; ed.title = "직접 고치기"; ed.setAttribute("aria-label", `${i+1}번 번역 고치기`);
+      const mo = el("button", "", "⋯"); mo.dataset.act = "more"; mo.title = "다른 표현 · 되돌리기"; mo.setAttribute("aria-label", `${i+1}번 번역 더 보기`);
+      tools.append(re, ed, mo); dst.append(t, tools);
+      const rv = el("div", "rv"); rv.hidden = true;
+      const more = el("div", "more"); more.hidden = true;
+      pair.append(s, dst, rv, more); doc.append(pair);
+      paintT(i);
+    });
+    $("egLabel").hidden = !isSample();
+    $("langSel").value = lang;
+    $("exportPanel").hidden = true; $("exportBtn").setAttribute("aria-expanded", "false"); $("exMsg").textContent = "";
+    $("docGloss").value = d.gloss || ""; $("glossMsg").textContent = "";
+    updateReviewCount();
+    if(d.cur >= sentences.length) d.cur = 0;
+    markCur(false); updateProg(); updateButtons(); applyShow();
+    if(lang === set.tgt) status(`원문과 번역 언어가 같아요(${langName(lang)}). 위에서 번역할 언어를 바꿔 주세요.`, true); else status("");
+  }
+  function paintT(i){
+    const t = tOf(i); if(!t) return;
+    const r = entry(i), v = r ? r.t : "";
+    t.classList.remove("busy");
+    t.classList.toggle("empty", !v);
+    t.textContent = v || (set.mode === "manual" ? "눌러서 번역" : "아직 번역 전");
+    if(r && r.tm) t.append(el("span", "tmhit", "같은 문장 재사용"));
+    paintRv(i);
+  }
+  function paintRv(i){
+    const row = rowOf(i); if(!row) return;
+    const box = row.querySelector(".rv"), r = entry(i), rv = r && r.rv;
+    row.classList.toggle("flag", !!rv);
+    box.hidden = !rv; box.textContent = "";
+    if(!rv) return;
+    box.append(el("div", "", "⚠ " + rv.msg));
+    if(rv.fix){ const f = el("div", "fix"); f.append(el("b", "", "제안: "), document.createTextNode(rv.fix)); box.append(f); }
+    const act = el("div", "row");
+    if(rv.fix){ const ap = el("button", "btn primary", "제안 적용"); ap.onclick = () => { setTr(i, rv.fix); saveNow(); paintT(i); updateReviewCount(); }; act.append(ap); }
+    const ig = el("button", "btn", "무시"); ig.onclick = () => { delete r.rv; saveNow(); paintRv(i); updateReviewCount(); }; act.append(ig);
+    box.append(act);
+  }
+  const saveNow = () => { if(!isSample()) saveDocs(); };
+  function markCur(scroll){
+    const d = curDoc();
+    doc.querySelectorAll(".pair.cur").forEach(x => x.classList.remove("cur"));
+    const r = rowOf(d.cur); if(!r) return;
+    r.classList.add("cur");
+    if(scroll){ try{ r.scrollIntoView({ block:"center", behavior:"smooth" }); }catch(e){} }
+  }
+  function setCur(i, scroll){ const d = curDoc(); d.cur = i; if(scroll) readMark = i; markCur(scroll); if(!isSample()) store.set("tx_docs", docs); }
+  let readMark = null, liveAt = null;
+  function markCtx(i){
+    clearCtx();
+    if(!set.ctxOn) return;
+    for(let j = Math.max(0, i - set.ctxN); j < i; j++){ const r = rowOf(j); if(r) r.classList.add("ctx"); }
+  }
+  function clearCtx(){ doc.querySelectorAll(".pair.ctx").forEach(x => x.classList.remove("ctx")); }
+  function updateProg(){
+    const n = sentences.length, k = doneCount();
+    $("progTxt").textContent = `${k} / ${n}문장`;
+    $("progBar").style.width = n ? (k / n * 100).toFixed(1) + "%" : "0";
+  }
+  function applyShow(){
+    doc.classList.toggle("only-dst", set.show === "dst");
+    doc.classList.toggle("only-src", set.show === "src");
+    $("showSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === set.show)));
+  }
+
+  // ---------- prompts ----------
+  function contextBlock(start){
+    if(!set.ctxOn || start <= 0) return "";
+    const from = Math.max(0, start - set.ctxN);
+    const lines = [];
+    for(let j = from; j < start; j++){
+      const t = trOf(j);
+      lines.push(`${sentences[j].s}` + (t ? `\n  → ${t}` : ""));
+    }
+    return `[앞 문맥 — 번역하지 말고 흐름·인물·호칭·용어·말투를 파악하는 데만 참고해]\n${lines.join("\n")}\n\n`;
+  }
+  function rules(){
+    const g = [(set.gloss || "").trim(), (curDoc().gloss || "").trim()].filter(Boolean).join("\n");
+    return `${STYLE[set.style] || STYLE.natural} 번역해.` + (g ? `\n반드시 지킬 용어집·메모 (표기를 그대로 따라):\n${g}` : "");
+  }
+  function promptOne(i){
+    const src = langName(curLang()), tgt = langName(set.tgt);
+    const ctx = contextBlock(i);
+    return `${ctx}아래 ${src} 문장 하나를 ${tgt}로 ${rules()}${ctx ? "\n앞 문맥의 흐름과 이미 정해진 번역 표현(이름, 호칭, 말투)에 맞춰 일관되게 번역해." : ""}
+설명이나 따옴표 없이, 번역문만 출력해.
+
+[번역할 문장]
+${sentences[i].s}`;
+  }
+  function promptBatch(idx){
+    const src = langName(curLang()), tgt = langName(set.tgt);
+    return `${contextBlock(idx[0])}아래 번호 붙은 ${src} 문장들을 각각 ${tgt}로 ${rules()}
+문장들은 이어지는 글이야. 앞뒤 흐름을 살리고 인물·호칭·용어·말투를 일관되게 유지해.
+문장마다 한 줄씩 "번호: 번역" 형식으로만 출력해. 번호와 문장 수를 정확히 맞추고, 다른 말은 쓰지 마.
+
+${idx.map((i, k) => `${k + 1}. ${sentences[i].s}`).join("\n")}`;
+  }
+  const cleanOut = x => String(x || "").replace(/^\s*(\[?번역(문|할 문장)?\]?|translation)\s*[:：]\s*/i, "").replace(/^["“「](.*)["”」]$/s, "$1").trim();
+
+  // ---------- one sentence ----------
+  const live = new Set();
+  async function translateOne(i, force){
+    if(!sentences[i]) return "";
+    if(!force && trOf(i)) return trOf(i);
+    if(!force){ const hit = tmIndex().get(sentences[i].s); if(hit){ setTr(i, hit, { tm:true }); saveNow(); paintT(i); updateProg(); updateButtons(); return hit; } }
+    const t = tOf(i), me = new AbortController(); live.add(me);
+    liveAt = i; updateRail();
+    if(t){ t.classList.remove("empty"); t.classList.add("busy"); t.textContent = "번역 중…"; }
+    markCtx(i);
+    try{
+      const out = await streamAI(promptOne(i), me.signal, x => { if(t && t.isConnected){ t.classList.remove("busy"); t.textContent = cleanOut(x); } }, Math.min(1200, 120 + sentences[i].s.length * 3));
+      const v = cleanOut(out);
+      if(!v) throw { code:"empty_completion" };
+      setTr(i, v); if(!isSample()) saveDocs();
+      paintT(i); updateProg(); updateButtons();
+      return v;
+    }catch(e){
+      if(t && t.isConnected){
+        if(e && e.code === "cancelled") paintT(i);
+        else { t.classList.remove("busy"); t.classList.add("empty"); t.textContent = errMsg(e); }
+      }
+      throw e;
+    }finally{ live.delete(me); clearCtx(); }
+  }
+  const nextTodo = from => { for(let i = Math.max(0, from); i < sentences.length; i++) if(!trOf(i)) return i; return -1; };
+
+  // manual: translate the sentence at the cursor, or the next one not yet done
+  async function stepOnce(){
+    const d = curDoc();
+    let i = trOf(d.cur) ? nextTodo(d.cur + 1) : d.cur;
+    if(i < 0) i = nextTodo(0);
+    if(i < 0){ status("모든 문장을 번역했어요."); return; }
+    setCur(i);
+    try{ await translateOne(i); status(""); }catch(e){ if(e && e.code !== "cancelled") status(errMsg(e), true); }
+  }
+
+  // auto: keep translating one sentence after another until stopped
+  const auto = { on:false };
+  async function runAuto(){
+    if(auto.on) return;
+    auto.on = true; updateButtons();
+    const d = curDoc();
+    let i = nextTodo(trOf(d.cur) ? d.cur + 1 : d.cur);
+    if(i < 0) i = nextTodo(0);
+    status(i < 0 ? "모든 문장을 번역했어요." : "자동 번역 중… 멈추려면 ‘멈춤’을 누르세요.");
+    while(auto.on && i >= 0){
+      setCur(i);
+      try{ await translateOne(i); }
+      catch(e){ if(!(e && e.code === "cancelled")){ status(errMsg(e), true); stoppedAlert("자동 번역", e, i, runAuto); } auto.on = false; break; }
+      i = nextTodo(i + 1);
+      if(i < 0){ status("끝까지 번역했어요."); if(document.hidden || !$("viewer").hidden || $("readView").hidden) notify(`“${curDoc().title}” 자동 번역을 끝냈어요.`, { kind:"ok", title:"번역 완료", ttl:8000 }); }
+    }
+    auto.on = false; updateButtons();
+  }
+  function stopAll(){
+    auto.on = false; batch.on = false; review.on = false;
+    live.forEach(c => { try{ c.abort(); }catch(e){} }); live.clear();
+    clearCtx(); updateButtons();
+  }
+
+  // ---------- everything at once ----------
+  const batch = { on:false };
+  async function translateAll(force){
+    if(batch.on) return;
+    auto.on = false;
+    let todo = sentences.map((o, i) => i).filter(i => force || !trOf(i));
+    if(!force){
+      const tm = tmIndex(); let reused = 0;
+      todo = todo.filter(i => { const hit = tm.get(sentences[i].s); if(hit){ setTr(i, hit, { tm:true }); paintT(i); reused++; return false; } return true; });
+      if(reused){ updateProg(); saveNow(); }
+    }
+    if(!todo.length){ status("이미 모두 번역했어요."); updateButtons(); return; }
+    const chunks = []; let cur = [];
+    todo.forEach(i => { if(cur.length && (cur.length >= 20 || i !== cur[cur.length - 1] + 1)){ chunks.push(cur); cur = []; } cur.push(i); });
+    if(cur.length) chunks.push(cur);
+    batch.on = true; updateButtons();
+    let done = 0, failed = 0;
+    for(const idx of chunks){
+      if(!batch.on) break;
+      status(`전체 번역 중… ${done} / ${todo.length}문장 · 앞 문맥 ${set.ctxOn ? set.ctxN + "문장" : "끔"}`);
+      idx.forEach(i => { const t = tOf(i); if(t){ t.classList.remove("empty"); t.classList.add("busy"); t.textContent = "번역 중…"; } });
+      markCtx(idx[0]); liveAt = idx[0]; updateRail();
+      const got = new Set();
+      const eat = (txt, final) => {
+        const lines = txt.split(/\r?\n/); if(!final) lines.pop();
+        lines.forEach(line => {
+          const m = line.match(/^\s*(\d+)\s*[:.)．：]\s*(.+)$/); if(!m) return;
+          const i = idx[+m[1] - 1]; if(i == null) return;
+          const v = cleanOut(m[2]); if(!v) return;
+          setTr(i, v); got.add(i); paintT(i);
+        });
+        updateProg();
+      };
+      const me = new AbortController(); live.add(me);
+      try{
+        const len = idx.reduce((a, i) => a + sentences[i].s.length, 0);
+        const full = await streamAI(promptBatch(idx), me.signal, x => eat(x, false), Math.min(8000, Math.round(len * 2.2) + 80 * idx.length));
+        eat(full, true);
+      }catch(e){
+        if(e && e.code === "cancelled"){ idx.forEach(i => { if(!got.has(i)) paintT(i); }); break; }
+        status(errMsg(e), true); stoppedAlert("전체 번역", e, idx[0], () => translateAll(false)); idx.forEach(i => { if(!got.has(i)) paintT(i); }); batch.on = false; break;
+      }finally{ live.delete(me); clearCtx(); }
+      idx.forEach(i => { if(!got.has(i)){ failed++; paintT(i); } });
+      done += idx.length;
+      if(!isSample()) saveDocs();
+    }
+    const wasOn = batch.on;
+    batch.on = false; updateButtons(); updateProg();
+    if(wasOn && (document.hidden || !$("viewer").hidden || $("readView").hidden)) notify(`“${curDoc().title}” 전체 번역을 끝냈어요.` + (failed ? ` ${failed}문장이 빠졌어요.` : ""), { kind:"ok", title:"번역 완료", ttl:8000 });
+    if(wasOn) status(failed ? `전체 번역을 마쳤어요. ${failed}문장은 빠졌어요. 그 문장을 눌러 따로 번역하거나 다시 ‘전체 일괄 번역’을 누르세요.` : "전체 번역을 마쳤어요.", !!failed);
+  }
+
+  // ---------- buttons ----------
+  let redoArm = 0;
+  function updateButtons(){
+    const all = sentences.length && doneCount() === sentences.length;
+    const step = $("stepBtn"), allB = $("allBtn");
+    $("modeSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.m === set.mode)));
+    if(set.mode === "auto"){ step.textContent = auto.on ? "■ 멈춤" : "▶ 자동 번역 시작"; step.className = "btn " + (auto.on ? "stop" : "primary"); }
+    else { step.textContent = "다음 문장 번역"; step.className = "btn primary"; }
+    step.disabled = batch.on || review.on;
+    const rb = $("reviewBtn"); rb.textContent = review.on ? "■ 검토 멈춤" : (+rb.dataset.count ? `✔ 번역 검토 · ⚠ ${rb.dataset.count}` : "✔ 번역 검토"); rb.className = "btn" + (review.on ? " stop" : ""); rb.disabled = batch.on || auto.on;
+    allB.textContent = batch.on ? "■ 멈춤" : redoArm ? "정말 전부 다시 번역할까요?" : all ? "전체 다시 번역" : "전체 일괄 번역";
+    allB.className = "btn" + (batch.on ? " stop" : "");
+    allB.disabled = auto.on || review.on;
+    updateRail();
+  }
+  $("stepBtn").onclick = () => {
+    if(set.mode === "auto"){ if(auto.on){ stopAll(); status("자동 번역을 멈췄어요."); } else runAuto(); }
+    else stepOnce();
+  };
+  $("allBtn").onclick = () => {
+    if(batch.on){ stopAll(); status("전체 번역을 멈췄어요."); return; }
+    const all = sentences.length && doneCount() === sentences.length;
+    if(all && !redoArm){ redoArm = setTimeout(() => { redoArm = 0; updateButtons(); }, 3500); updateButtons(); return; }
+    const force = !!redoArm; if(redoArm){ clearTimeout(redoArm); redoArm = 0; }
+    translateAll(force);
+  };
+  $("modeSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if(!b) return;
+    if(auto.on) stopAll();
+    set.mode = b.dataset.m; saveSet();
+    sentences.forEach((o, i) => { if(!trOf(i)) paintT(i); });
+    updateButtons();
+    status(set.mode === "auto" ? "‘자동 번역 시작’을 누르면 표시된 문장부터 한 문장씩 이어서 번역해요." : "문장을 누르거나 ‘다음 문장 번역’을 누르면 한 문장씩 번역해요.");
+  });
+
+  // ---------- clicks on the text ----------
+  doc.addEventListener("click", e => {
+    const pair = e.target.closest(".pair"); if(!pair) return;
+    const i = +pair.dataset.i;
+    const act = e.target.closest("button[data-act]");
+    if(act){
+      if(act.dataset.act === "re"){ setCur(i); translateOne(i, true).catch(err => { if(err && err.code !== "cancelled") status(errMsg(err), true); }); }
+      else if(act.dataset.act === "more"){ setCur(i); toggleMore(i); }
+      else startEdit(i);
+      return;
+    }
+    if(e.target.closest(".t[contenteditable='true']") || e.target.closest(".more") || e.target.closest(".rv")) return;
+    const wEl = e.target.closest(".w");
+    if(wEl && set.wordTap){ setCur(i); readMark = i; showWordCard(wEl.dataset.w, sentences[i].s, curLang(), wEl, true); return; }
+    if(e.target.closest(".t.empty") && !e.target.closest(".t.busy")){ setCur(i); readMark = i; translateOne(i).catch(err => { if(err && err.code !== "cancelled") status(errMsg(err), true); }); return; }
+    if(auto.on){ stopAll(); status("자동 번역을 멈추고 이 문장으로 옮겼어요. 여기서부터 다시 시작할 수 있어요."); }
+    setCur(i); readMark = i;
+    if(set.mode === "manual" && !trOf(i)) translateOne(i).catch(err => { if(err && err.code !== "cancelled") status(errMsg(err), true); });
+  });
+  doc.addEventListener("keydown", e => {
+    if((e.key === "Enter" || e.key === " ") && e.target.classList.contains("src")){ e.preventDefault(); e.target.click(); }
+  });
+  function startEdit(i){
+    const t = tOf(i); if(!t) return;
+    const before = trOf(i);
+    t.classList.remove("empty"); t.textContent = before; t.contentEditable = "true"; t.focus();
+    try{ const r = document.createRange(); r.selectNodeContents(t); r.collapse(false); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }catch(e){}
+    const finish = keep => {
+      t.contentEditable = "false"; t.removeEventListener("keydown", onKey); t.removeEventListener("blur", onBlur);
+      const v = t.textContent.trim();
+      if(keep && v !== before){ if(v) setTr(i, v); else delete curDoc().tr[i]; if(!isSample()) saveDocs(); updateProg(); }
+      paintT(i);
+    };
+    const onKey = e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); finish(true); } if(e.key === "Escape"){ e.preventDefault(); finish(false); } };
+    const onBlur = () => finish(true);
+    t.addEventListener("keydown", onKey); t.addEventListener("blur", onBlur);
+  }
+  document.addEventListener("keydown", e => {
+    if(e.target.closest && e.target.closest("input,textarea,select,[contenteditable='true']")) return;
+    if($("readView").hidden) return;
+    if(e.key === "ArrowDown" || e.key === "j"){ const d = curDoc(); if(d.cur < sentences.length - 1){ setCur(d.cur + 1, true); e.preventDefault(); } }
+    if(e.key === "ArrowUp" || e.key === "k"){ const d = curDoc(); if(d.cur > 0){ setCur(d.cur - 1, true); e.preventDefault(); } }
+    if(e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey){
+      if(e.target.closest && e.target.closest("button,.src")) return;
+      const d = curDoc(); e.preventDefault();
+      if(!trOf(d.cur)) translateOne(d.cur).catch(err => { if(err && err.code !== "cancelled") status(errMsg(err), true); });
+      else stepOnce();
+    }
+    if(e.key === "n" || e.key === "N"){ const i = nextTodo(curDoc().cur + 1); const j = i < 0 ? nextTodo(0) : i; if(j >= 0){ setCur(j, true); e.preventDefault(); } else status("번역하지 않은 문장이 없어요."); }
+    if(e.key === "r" || e.key === "R"){ jumpReview(); e.preventDefault(); }
+  });
+
+  // ---------- language + context controls ----------
+  (function(){
+    const ls = $("langSel"), ts = $("tgtSel"), sl = $("srcLang");
+    Object.entries(LANGS).forEach(([k, v]) => {
+      const o = el("option", "", v.name); o.value = k; ls.append(o);
+      if(k !== "other"){ const o2 = el("option", "", v.name); o2.value = k; ts.append(o2); const o3 = el("option", "", v.name); o3.value = k; sl.append(o3); }
+    });
+    ts.value = set.tgt;
+    ls.addEventListener("change", () => { const d = curDoc(); d.lang = ls.value; if(!isSample()) saveDocs(); render(); });
+    ts.addEventListener("change", () => { stopAll(); set.tgt = ts.value; saveSet(); render(); });
+    const ctxOn = $("ctxOn"), ctxN = $("ctxN"), out = $("ctxOut");
+    const paint = () => { ctxOn.checked = set.ctxOn; ctxN.value = set.ctxN; ctxN.disabled = !set.ctxOn; out.textContent = set.ctxOn ? `${set.ctxN}문장` : "끔"; };
+    ctxOn.addEventListener("change", () => { set.ctxOn = ctxOn.checked; saveSet(); paint(); });
+    ctxN.addEventListener("input", () => { set.ctxN = +ctxN.value; saveSet(); paint(); });
+    paint();
+    $("showSeg").addEventListener("click", e => { const b = e.target.closest("button"); if(b){ set.show = b.dataset.v; saveSet(); applyShow(); } });
+    $("styleSel").value = set.style; $("glossary").value = set.gloss || "";
+    $("wordTap").checked = set.wordTap !== false;
+    $("wordTap").addEventListener("change", () => { set.wordTap = $("wordTap").checked; saveSet(); doc.classList.toggle("notap", !set.wordTap); if(!set.wordTap) closeCard(); });
+    doc.classList.toggle("notap", set.wordTap === false);
+    $("styleSel").addEventListener("change", () => { set.style = $("styleSel").value; saveSet(); });
+    $("glossary").addEventListener("input", () => { set.gloss = $("glossary").value; saveSet(); });
+  })();
+
+  // ---------- more: alternatives + undo ----------
+  function toggleMore(i){
+    const row = rowOf(i), box = row.querySelector(".more");
+    if(!box.hidden){ box.hidden = true; return; }
+    doc.querySelectorAll(".more").forEach(m => m.hidden = true);
+    box.hidden = false; box.textContent = "";
+    const r = entry(i), h = r && r.h || [];
+    const act = el("div", "row");
+    const alt = el("button", "btn primary", "다른 표현 3가지"); alt.onclick = () => loadAlts(i, box);
+    act.append(alt);
+    if(h.length){ const un = el("button", "btn", `이전 번역으로 되돌리기 (${h.length})`); un.onclick = () => { const prev = h[h.length - 1]; const cur = r.t; r.h = h.slice(0, -1); r.t = prev; r.tm = false; if(cur && cur !== prev){ /* keep the undone one reachable via alternatives */ } saveNow(); paintT(i); toggleMore(i); toggleMore(i); }; act.append(un); }
+    const cl = el("button", "btn", "닫기"); cl.onclick = () => { box.hidden = true; }; act.append(cl);
+    box.append(act);
+    if(h.length){ const hl = el("div", "muted", "이전 번역: " + h.slice().reverse().map(x => `“${x}”`).join(" · ")); box.append(hl); }
+  }
+  async function loadAlts(i, box){
+    const wait = el("div", "muted", "다른 표현을 만드는 중…"); box.append(wait);
+    const src = langName(curLang()), tgt = langName(set.tgt), ctx = contextBlock(i), cur = trOf(i);
+    const prompt = `${ctx}아래 ${src} 문장을 ${tgt}로 서로 느낌이 다른 번역 3가지로 써 줘. ${rules()}
+${cur ? `지금 번역("${cur}")과는 다르게 써.` : ""}
+한 줄에 하나씩 "1: 번역 | 어떤 느낌인지 짧게" 형식으로만 출력해.
+
+[번역할 문장]
+${sentences[i].s}`;
+    try{
+      const out = await streamAI(prompt, undefined, null, Math.min(1500, 200 + sentences[i].s.length * 8));
+      wait.remove();
+      const alts = out.split(/\r?\n/).map(l => l.match(/^\s*\d+\s*[:.)]\s*(.+)$/)).filter(Boolean).map(m => { const [t, ...n] = m[1].split("|"); return { t: cleanOut(t), note: n.join("|").trim() }; }).filter(a => a.t).slice(0, 3);
+      if(!alts.length){ box.append(el("div", "muted", "다른 표현을 받지 못했어요. 다시 눌러 주세요.")); return; }
+      alts.forEach(a => {
+        const b = el("button", "alt", a.t); if(a.note) b.append(el("small", "", a.note));
+        b.onclick = () => { setTr(i, a.t); saveNow(); paintT(i); updateProg(); box.hidden = true; };
+        box.append(b);
+      });
+    }catch(e){ wait.textContent = errMsg(e); }
+  }
+
+  // ---------- glossary (용어집) ----------
+  $("glossBtn").onclick = () => { const open = $("glossPanel").hidden; $("glossPanel").hidden = !open; $("glossBtn").setAttribute("aria-expanded", String(open)); };
+  $("docGloss").addEventListener("input", () => { curDoc().gloss = $("docGloss").value; saveNow(); });
+  $("glossAuto").onclick = async () => {
+    const d = curDoc(), btn = $("glossAuto"), msg = $("glossMsg");
+    btn.disabled = true; msg.textContent = "글에서 이름과 용어를 찾는 중…";
+    const src = langName(curLang()), tgt = langName(set.tgt);
+    const have = new Set((d.gloss || "").split("\n").map(l => l.split("→")[0].trim().toLowerCase()).filter(Boolean));
+    try{
+      const out = await streamAI(`아래 ${src} 글에서 인물 이름, 지명, 단체·작품 이름, 여러 번 나오는 핵심 용어를 최대 30개 뽑아서 ${tgt} 번역 표기를 정해 줘. 이름은 원어 발음에 맞게 표기해.
+한 줄에 하나씩 "원어 → 번역 (짧은 설명)" 형식으로만 출력해.
+
+${d.text.slice(0, 12000)}`, undefined, null, 1500);
+      const lines = out.split(/\r?\n/).map(l => l.replace(/^[\s*\-•\d.)]+/, "").trim()).filter(l => l.includes("→"));
+      const add = lines.filter(l => !have.has(l.split("→")[0].trim().toLowerCase()));
+      if(add.length){ d.gloss = ((d.gloss || "").trim() + "\n" + add.join("\n")).trim(); $("docGloss").value = d.gloss; saveNow(); }
+      msg.textContent = add.length ? `${add.length}개를 추가했어요. 틀린 표기는 직접 고쳐 주세요.` : "새로 추가할 용어를 찾지 못했어요.";
+    }catch(e){ msg.textContent = errMsg(e); }
+    btn.disabled = false;
+  };
+
+  // ---------- review (번역 검토) ----------
+  const review = { on:false };
+  function updateReviewCount(){
+    const n = sentences.reduce((k, o, i) => k + (entry(i) && entry(i).rv ? 1 : 0), 0);
+    $("reviewBtn").dataset.count = n;
+    if(!review.on && !auto.on && !batch.on) $("reviewBtn").textContent = n ? `✔ 번역 검토 · ⚠ ${n}` : "✔ 번역 검토";
+  }
+  function jumpReview(){
+    const d = curDoc();
+    for(let k = 1; k <= sentences.length; k++){ const i = (d.cur + k) % sentences.length; const r = entry(i); if(r && r.rv){ setCur(i, true); return; } }
+    status("검토에서 표시된 문장이 없어요.");
+  }
+  $("reviewBtn").onclick = async () => {
+    if(review.on){ stopAll(); status("검토를 멈췄어요."); return; }
+    const idx = sentences.map((o, i) => i).filter(i => trOf(i));
+    if(!idx.length){ status("먼저 번역한 뒤에 검토할 수 있어요."); return; }
+    review.on = true; updateButtons();
+    idx.forEach(i => { const r = entry(i); if(r) delete r.rv; paintRv(i); });
+    const src = langName(curLang()), tgt = langName(set.tgt);
+    let flagged = 0;
+    for(let k = 0; k < idx.length && review.on; k += 15){
+      const part = idx.slice(k, k + 15);
+      status(`번역 검토 중… ${k} / ${idx.length}문장`);
+      const me = new AbortController(); live.add(me);
+      liveAt = part[0]; updateRail();
+      try{
+        const out = await streamAI(`${contextBlock(part[0])}다음은 ${src} 원문과 ${tgt} 번역을 짝지은 목록이야. ${rules()}
+오역, 빠진 내용, 앞뒤와 맞지 않는 이름·호칭·용어, 크게 어색한 표현이 있는 번역만 골라.
+고를 것만 한 줄에 하나씩 "번호: 문제 설명(한국어, 짧게) | 고친 번역" 형식으로 써. 문제가 없는 번호는 쓰지 마. 모두 괜찮으면 "없음"이라고만 써.
+
+${part.map((i, n) => `${n + 1}. 원문: ${sentences[i].s}\n   번역: ${trOf(i)}`).join("\n")}`, me.signal, null, 250 * part.length + 200);
+        out.split(/\r?\n/).forEach(line => {
+          const m = line.match(/^\s*(\d+)\s*[:.)]\s*(.+)$/); if(!m) return;
+          const i = part[+m[1] - 1]; if(i == null) return;
+          const [msg, ...fx] = m[2].split("|");
+          const r = entry(i); if(!r) return;
+          r.rv = { msg: msg.trim(), fix: cleanOut(fx.join("|")) };
+          if(r.rv.fix === r.t) r.rv.fix = "";
+          flagged++; paintRv(i);
+        });
+      }catch(e){ if(!(e && e.code === "cancelled")){ status(errMsg(e), true); stoppedAlert("번역 검토", e, part[0], () => $("reviewBtn").click()); } review.on = false; }
+      finally{ live.delete(me); clearCtx(); }
+    }
+    const finished = review.on;
+    review.on = false; saveNow(); updateButtons(); updateReviewCount();
+    if(finished) status(flagged ? `검토를 마쳤어요. ⚠ ${flagged}문장을 확인해 보세요. R 키로 차례로 이동할 수 있어요.` : "검토를 마쳤어요. 눈에 띄는 문제가 없어요.");
+    if(flagged) jumpReview();
+  };
+
+  // ---------- backup ----------
+  $("bkSave").onclick = async () => {
+    const d = new Date(), name = `톡톡번역기-백업-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
+    try{ const n = await saveFileAs(name, JSON.stringify({ app:"toktok-translate", v:1, at:Date.now(), docs, set }, null, 1), "application/json"); $("bkMsg").textContent = n ? `"${n}"(으)로 저장했어요.` : "저장을 취소했어요."; }
+    catch(e){ $("bkMsg").textContent = "파일로 저장하지 못했어요."; }
+  };
+  $("bkOpen").onclick = () => $("bkFile").click();
+  $("bkFile").addEventListener("change", async e => {
+    const f = e.target.files && e.target.files[0]; e.target.value = ""; if(!f) return;
+    try{
+      const o = JSON.parse(await f.text());
+      if(!o || o.app !== "toktok-translate" || !Array.isArray(o.docs)) throw 0;
+      let add = 0, upd = 0;
+      o.docs.forEach(x => {
+        if(!x || !x.id || !x.text) return;
+        const i = docs.findIndex(d => d.id === x.id);
+        const clean = Object.assign({ tr:{}, cur:0 }, x);
+        if(i < 0){ docs.push(clean); add++; } else if((x.at || 0) >= (docs[i].at || 0)){ docs[i] = Object.assign({}, docs[i], clean, { tr: Object.assign({}, docs[i].tr, clean.tr) }); upd++; }
+      });
+      docs.sort((a, b) => (b.at || 0) - (a.at || 0));
+      if(!curId && docs[0]) curId = docs[0].id;
+      saveDocs(); renderLib(); render();
+      $("bkMsg").textContent = `불러왔어요: 새 글 ${add}개` + (upd ? `, 합친 글 ${upd}개` : "") + ".";
+    }catch(err){ $("bkMsg").textContent = "톡톡 번역 백업 파일이 아니에요."; }
+  });
+
+  // ---------- side buttons: top / where I was reading / where it is translating ----------
+  function centerIndex(){
+    const mid = window.innerHeight / 2, rows = doc.querySelectorAll(".pair");
+    let best = null, bd = Infinity;
+    for(const r of rows){
+      const b = r.getBoundingClientRect();
+      if(b.bottom < 0) continue;
+      const dd = Math.abs((b.top + b.bottom) / 2 - mid);
+      if(dd < bd){ bd = dd; best = +r.dataset.i; }
+      if(b.top > window.innerHeight) break;
+    }
+    return best;
+  }
+  function goRow(i){
+    const r = rowOf(i); if(!r) return false;
+    try{ r.scrollIntoView({ block:"center", behavior:"smooth" }); }catch(e){ r.scrollIntoView(); }
+    r.classList.remove("pulse"); void r.offsetWidth; r.classList.add("pulse");
+    setTimeout(() => r.classList.remove("pulse"), 1400);
+    return true;
+  }
+  function updateRail(){
+    const running = auto.on || batch.on || review.on;
+    $("railLive").hidden = !running || liveAt == null;
+    $("railBack").disabled = readMark == null && centerIndex() == null;
+  }
+  $("railTop").onclick = () => {
+    const c = centerIndex();
+    if(c != null && window.scrollY > 200) readMark = c;
+    window.scrollTo({ top:0, behavior:"smooth" });
+    updateRail();
+  };
+  $("railBack").onclick = () => {
+    const i = readMark != null ? readMark : curDoc().cur;
+    if(!goRow(i)) status("돌아갈 문장이 없어요.");
+  };
+  $("railLive").onclick = () => { const c = centerIndex(); if(c != null) readMark = c; goRow(liveAt); };
+
+  // ---------- view ----------
+  let view = Object.assign({ fs:18, lh:1.75, pw:"normal" }, store.get("tx_view", {}));
+  const PW = { normal:"1000px", wide:"1400px", full:"100%" };
+  function applyView(){
+    view.fs = Math.min(30, Math.max(14, +view.fs || 18)); view.lh = Math.min(2.6, Math.max(1.3, +view.lh || 1.75)); if(!PW[view.pw]) view.pw = "normal";
+    doc.style.setProperty("--fs", view.fs + "px"); doc.style.setProperty("--lh", String(view.lh));
+    document.documentElement.style.setProperty("--wrapmax", PW[view.pw]);
+    $("fsRange").value = view.fs; $("lhRange").value = view.lh;
+    $("pwSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.pw === view.pw)));
+    store.set("tx_view", view);
+  }
+  $("viewBtn").onclick = () => { const open = $("viewPanel").hidden; $("viewPanel").hidden = !open; $("viewBtn").setAttribute("aria-expanded", String(open)); };
+  $("fsRange").addEventListener("input", e => { view.fs = +e.target.value; applyView(); });
+  $("lhRange").addEventListener("input", e => { view.lh = +e.target.value; applyView(); });
+  $("pwSeg").addEventListener("click", e => { const b = e.target.closest("button"); if(b){ view.pw = b.dataset.pw; applyView(); } });
+
+  // ---------- save as (다른 이름으로 저장) ----------
+  const safeName = t => (String(t || "번역").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60) || "번역");
+  function askName(suggested){
+    return new Promise(resolve => {
+      const m = $("saveModal"), inp = $("saveName");
+      inp.value = suggested; m.hidden = false;
+      setTimeout(() => { inp.focus(); const dot = suggested.lastIndexOf("."); try{ inp.setSelectionRange(0, dot > 0 ? dot : suggested.length); }catch(e){} }, 30);
+      const done = v => { m.hidden = true; $("saveOk").onclick = $("saveCancel").onclick = null; inp.onkeydown = null; resolve(v); };
+      $("saveOk").onclick = () => { let v = inp.value.trim(); if(!v) return; const ext = suggested.match(/\.[a-z0-9]+$/i); if(ext && !/\.[a-z0-9]{2,5}$/i.test(v)) v += ext[0]; done(v); };
+      $("saveCancel").onclick = () => done(null);
+      inp.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); $("saveOk").click(); } if(e.key === "Escape"){ e.preventDefault(); done(null); } };
+    });
+  }
+  // Opens the system "Save as" window where the browser allows it; otherwise asks for a file name first.
+  async function saveFileAs(suggested, data, mime){
+    const blob = data instanceof Blob ? data : new Blob([data], { type: mime || "text/plain;charset=utf-8" });
+    if(inArtifact){
+      const dl = await window.claude.use("downloads");
+      if(!dl) throw new Error("no downloads");
+      await dl.save({ filename: suggested, data: blob }); return suggested;
+    }
+    if(window.showSaveFilePicker){
+      try{
+        const ext = (suggested.match(/\.[a-z0-9]+$/i) || [".txt"])[0].toLowerCase();
+        const desc = { ".txt":"텍스트 파일", ".csv":"CSV 파일", ".zip":"ZIP 압축 파일", ".json":"백업 파일" }[ext] || "파일";
+        const h = await window.showSaveFilePicker({ suggestedName: suggested, types: [{ description: desc, accept: { [(mime || "text/plain").split(";")[0]]: [ext] } }] });
+        const w = await h.createWritable(); await w.write(blob); await w.close();
+        return h.name;
+      }catch(e){
+        if(e && e.name === "AbortError") return null;
+        // some windows (e.g. embedded views) refuse the picker: fall back to asking for a name
+      }
+    }
+    const name = await askName(suggested);
+    if(!name) return null;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = name;
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    return name;
+  }
+
+  // ---------- export (one text or many) ----------
+  function docRows(d){
+    const lang = d.lang || detectLang(d.text), ss = splitSentences(d.text, lang);
+    return ss.map((o, i) => { const r = d.tr[i]; return { s:o.s, para:o.para, t: r && r.s === o.s && (!r.g || r.g === set.tgt) ? r.t : "" }; });
+  }
+  function docExport(d, kind){
+    const rows = docRows(d), lang = d.lang || detectLang(d.text);
+    const head = [d.title || "", d.src || "", `${langName(lang)} → ${langName(set.tgt)}`].filter(Boolean).join("\n");
+    const paras = []; rows.forEach(r => { (paras[r.para] = paras[r.para] || []).push(r); });
+    const P = paras.filter(Boolean), title = safeName(d.title);
+    const miss = rows.filter(r => !r.t).length;
+    if(kind === "tr") return { name:`${title}-번역.txt`, text: head + "\n\n" + P.map(p => p.map(r => r.t).filter(Boolean).join(" ")).join("\n\n") + "\n", miss, rows };
+    if(kind === "both") return { name:`${title}-원문과번역.txt`, text: head + "\n\n" + P.map(p => p.map(r => `${r.s}\n${r.t || "(번역 없음)"}`).join("\n\n")).join("\n\n────────\n\n") + "\n", miss, rows };
+    const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+    return { name:`${title}-번역.csv`, mime:"text/csv;charset=utf-8", text: "﻿" + ["번호,문단,원문,번역"].concat(rows.map((r, i) => [i + 1, r.para + 1, q(r.s), q(r.t)].join(","))).join("\r\n") + "\r\n", miss, rows };
+  }
+  $("exportBtn").onclick = () => { const open = $("exportPanel").hidden; $("exportPanel").hidden = !open; $("exportBtn").setAttribute("aria-expanded", String(open)); $("exMsg").textContent = ""; };
+  $("exportPanel").addEventListener("click", async e => {
+    const b = e.target.closest("button[data-ex]"); if(!b) return;
+    const msg = $("exMsg"); msg.classList.remove("warn");
+    const x = docExport(curDoc(), b.dataset.ex);
+    try{
+      const saved = await saveFileAs(x.name, x.text, x.mime);
+      msg.textContent = saved ? `"${saved}"(으)로 저장했어요.` + (x.miss ? ` 아직 번역하지 않은 ${x.miss}문장은 비어 있어요.` : "") : "저장을 취소했어요.";
+    }catch(err){ msg.textContent = "파일로 저장하지 못했어요."; msg.classList.add("warn"); }
+  });
+
+  // ---------- library with checklist ----------
+  const picked = new Set();
+  const busyDoc = () => (auto.on || batch.on || review.on) ? curId : null;
+  function renderLib(){
+    const list = $("libList"); list.textContent = "";
+    $("libEmpty").hidden = docs.length > 0;
+    [...picked].forEach(id => { if(!docs.some(d => d.id === id)) picked.delete(id); });
+    $("libTools").hidden = !docs.length;
+    docs.forEach(d => {
+      const li = el("li", "sitem");
+      const ck = el("label", "pick"), cb = el("input"); cb.type = "checkbox"; cb.checked = picked.has(d.id); cb.setAttribute("aria-label", (d.title || "글") + " 선택");
+      cb.onchange = () => { cb.checked ? picked.add(d.id) : picked.delete(d.id); updatePick(); };
+      ck.append(cb);
+      const open = el("button", "sopen");
+      const t = el("span", "stitle", d.title || "제목 없음");
+      if(d.id === curId) t.append(el("span", "badge", busyDoc() === d.id ? "번역 중" : "여는 중"));
+      const rows = docRows(d), k = rows.filter(r => r.t).length;
+      let host = ""; try{ host = d.src ? new URL(d.src).hostname.replace(/^www\./, "") : ""; }catch(e){}
+      open.append(t, el("span", "ssub", [langName(d.lang || detectLang(d.text)), `번역 ${k}/${rows.length}문장 (${rows.length ? Math.round(k / rows.length * 100) : 0}%)`, fmtDate(d.at).split(" ")[0], host].filter(Boolean).join(" · ")));
+      open.onclick = () => {
+        if(busyDoc() && busyDoc() !== d.id){ openViewer(d); notify("다른 글을 번역하는 중이라 이 글은 보기 창으로 열었어요. 번역은 계속 진행돼요.", { kind:"info", ttl:5000 }); return; }
+        curId = d.id; saveDocs(); if(!busyDoc()) render(); setTab("read"); window.scrollTo({ top:0 });
+      };
+      const view = el("button", "sdel view", "👁"); view.title = "보기 창으로 열기"; view.setAttribute("aria-label", (d.title || "글") + " 보기 창으로 열기");
+      view.onclick = () => openViewer(d);
+      const del = el("button", "sdel", "×"); del.setAttribute("aria-label", (d.title || "글") + " 삭제");
+      del.onclick = () => {
+        if(busyDoc() === d.id){ notify("번역 중인 글은 지울 수 없어요. 먼저 멈춰 주세요.", { kind:"info", ttl:4000 }); return; }
+        if(del.dataset.arm !== "1"){ del.dataset.arm = "1"; del.textContent = "삭제?"; del.style.fontSize = ".8rem"; setTimeout(() => { if(del.isConnected){ del.dataset.arm = ""; del.textContent = "×"; del.style.fontSize = ""; } }, 3000); return; }
+        docs = docs.filter(x => x.id !== d.id); picked.delete(d.id);
+        if(curId === d.id){ curId = docs[0] ? docs[0].id : null; render(); }
+        saveDocs(); renderLib();
+      };
+      li.append(ck, open, view, del); list.append(li);
+    });
+    updatePick();
+  }
+  function updatePick(){
+    const n = picked.size;
+    $("pickAll").checked = n > 0 && n === docs.length;
+    $("pickAll").indeterminate = n > 0 && n < docs.length;
+    $("pickCount").textContent = n ? `${n}개 선택` : "전체 선택";
+    $("bulkSave").disabled = !n; $("bulkDel").disabled = !n;
+  }
+  $("pickAll").onchange = () => { if($("pickAll").checked) docs.forEach(d => picked.add(d.id)); else picked.clear(); renderLib(); };
+  $("bulkSave").onclick = () => { const p = $("bulkPanel"); p.hidden = !p.hidden; $("bulkMsg").textContent = ""; };
+  $("bulkGo").onclick = async () => {
+    const ds = docs.filter(d => picked.has(d.id)); if(!ds.length) return;
+    const kind = $("bulkKind").value, pack = $("bulkPack").value, msg = $("bulkMsg");
+    msg.classList.remove("warn");
+    const day = new Date(), stamp = `${day.getFullYear()}${pad(day.getMonth()+1)}${pad(day.getDate())}`;
+    try{
+      let saved;
+      if(ds.length === 1){ const x = docExport(ds[0], kind); saved = await saveFileAs(x.name, x.text, x.mime); }
+      else if(pack === "zip"){
+        msg.textContent = "ZIP 파일을 만드는 중…";
+        const JSZip = await need("JSZip", "zip"), z = new JSZip(), used = new Set();
+        ds.forEach(d => { const x = docExport(d, kind); let n = x.name, k = 2; while(used.has(n)){ n = x.name.replace(/(\.[a-z]+)$/i, ` (${k++})$1`); } used.add(n); z.file(n, x.text); });
+        const blob = await z.generateAsync({ type:"blob" });
+        saved = await saveFileAs(`톡톡번역기-${ds.length}개-${stamp}.zip`, blob, "application/zip");
+      } else {
+        if(kind === "csv"){
+          const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+          const lines = ["글 제목,번호,문단,원문,번역"];
+          ds.forEach(d => docExport(d, "csv").rows.forEach((r, i) => lines.push([q(d.title || ""), i + 1, r.para + 1, q(r.s), q(r.t)].join(","))));
+          saved = await saveFileAs(`톡톡번역기-${ds.length}개-${stamp}.csv`, "﻿" + lines.join("\r\n") + "\r\n", "text/csv;charset=utf-8");
+        } else {
+          const text = ds.map(d => docExport(d, kind).text).join("\n\n════════════════════════\n\n");
+          saved = await saveFileAs(`톡톡번역기-${ds.length}개-${stamp}.txt`, text);
+        }
+      }
+      msg.textContent = saved ? `"${saved}"(으)로 저장했어요.` : "저장을 취소했어요.";
+    }catch(err){ msg.textContent = "파일로 저장하지 못했어요." + (/JSZip|load/.test(String(err && err.message)) ? " (압축 도구를 불러오지 못했어요)" : ""); msg.classList.add("warn"); }
+  };
+  $("bulkDel").onclick = () => {
+    const b = $("bulkDel");
+    const ids = [...picked].filter(id => id !== busyDoc());
+    if(!ids.length) return;
+    if(b.dataset.arm !== "1"){ b.dataset.arm = "1"; b.textContent = `${ids.length}개 정말 삭제?`; setTimeout(() => { b.dataset.arm = ""; b.textContent = "선택 삭제"; }, 3500); return; }
+    b.dataset.arm = ""; b.textContent = "선택 삭제";
+    docs = docs.filter(d => !ids.includes(d.id)); ids.forEach(id => picked.delete(id));
+    if(!docs.some(d => d.id === curId)){ curId = docs[0] ? docs[0].id : null; render(); }
+    saveDocs(); renderLib();
+  };
+  $("libNew").onclick = () => setTab("edit");
+
+  // ---------- alerts (알림) ----------
+  const baseTitle = document.title;
+  function notify(text, opt){
+    opt = opt || {};
+    const box = $("toasts"), t = el("div", "toast " + (opt.kind || "info"));
+    t.setAttribute("role", opt.kind === "error" ? "alert" : "status");
+    const head = el("div", "th");
+    head.append(el("b", "", opt.title || (opt.kind === "error" ? "번역이 멈췄어요" : opt.kind === "ok" ? "완료" : "알림")));
+    const x = el("button", "tx", "×"); x.setAttribute("aria-label", "알림 닫기"); head.append(x);
+    t.append(head, el("div", "tb", text));
+    const close = () => { t.remove(); if(!box.querySelector(".toast.error")) document.title = baseTitle; };
+    x.onclick = close;
+    if(opt.actions && opt.actions.length){
+      const row = el("div", "row");
+      opt.actions.forEach(a => { const b = el("button", "btn" + (a.primary ? " primary" : ""), a.label); b.onclick = () => { close(); a.fn(); }; row.append(b); });
+      t.append(row);
+    }
+    box.prepend(t);
+    while(box.children.length > 4) box.lastChild.remove();
+    if(opt.kind === "error") document.title = "⚠ " + baseTitle;
+    if(opt.ttl) setTimeout(() => { if(t.isConnected) close(); }, opt.ttl);
+    return t;
+  }
+  function stopReason(e){
+    const c = e && e.code;
+    if(c === "rate_limited") return "AI 사용 한도에 걸렸어요. 잠시 뒤 이어서 번역하거나, 요금제·무료 사용량을 확인해 주세요.";
+    if(c === "blocked" || c === "upstream_error") return "인터넷 연결이 끊겼거나 AI 서버가 응답하지 않아요. 연결을 확인하고 이어서 번역하세요.";
+    return errMsg(e);
+  }
+  function stoppedAlert(what, e, at, resume){
+    notify(`${what}이(가) ${at != null ? `${at + 1}번 문장에서 ` : ""}멈췄어요. ${stopReason(e)}`, { kind:"error", actions: [
+      { label:"이어서 번역", primary:true, fn: resume },
+      ...(at != null ? [{ label:"그 문장 보기", fn: () => { setTab("read"); goRow(at); } }] : []),
+      ...(FIXABLE.includes(e && e.code) ? [{ label:"설정 열기", fn: () => { toggleSettings(true); window.scrollTo({ top:0 }); } }] : [])
+    ]});
+  }
+
+  // ---------- word meaning on tap (단어 뜻) ----------
+  function buildSrc(container, text, lang){
+    let last = 0;
+    wordsOf(text, lang).forEach(({ w, o }) => {
+      if(o > last) container.append(text.slice(last, o));
+      const s = el("span", "w", w); s.dataset.w = w; container.append(s); last = o + w.length;
+    });
+    if(last < text.length) container.append(text.slice(last));
+  }
+  function parseKV(t){
+    const o = {};
+    String(t || "").split(/\r?\n/).forEach(line => { const m = line.replace(/^[\s*\-•]+/, "").match(/^([A-Z_]{2,8})\s*[:：]\s*(.*)$/); if(m && m[2].trim() && m[2].trim() !== "-") o[m[1]] = m[2].replace(/\*\*/g, "").trim(); });
+    return o;
+  }
+  let wcCtl = null, wcache = store.get("tx_wc", {});
+  if(!wcache || typeof wcache !== "object") wcache = {};
+  function placeCard(anchor){
+    const c = $("wcard");
+    if(window.innerWidth < 700 || !anchor){ c.classList.add("sheet"); c.style.left = c.style.top = ""; return; }
+    c.classList.remove("sheet");
+    const r = anchor.getBoundingClientRect(), w = Math.min(360, window.innerWidth - 24);
+    c.style.width = w + "px";
+    let left = Math.min(Math.max(12, r.left), window.innerWidth - w - 12);
+    let top = r.bottom + 8;
+    c.style.left = left + "px"; c.style.top = top + "px";
+    requestAnimationFrame(() => { const h = c.offsetHeight; if(top + h > window.innerHeight - 12) c.style.top = Math.max(12, r.top - h - 8) + "px"; });
+  }
+  function closeCard(){ $("wcard").hidden = true; if(wcCtl){ wcCtl.abort(); wcCtl = null; } document.querySelectorAll(".w.on").forEach(x => x.classList.remove("on")); }
+  function paintCard(w, d, lang, done, gloss){
+    const b = $("wcBody"); b.textContent = "";
+    b.append(el("div", "wh", d.LEMMA || w));
+    const meta = el("div", "wm");
+    if(d.POS) meta.append(el("span", "pos", d.POS));
+    if(d.PRON) meta.append(el("span", "pron", d.PRON));
+    if(meta.childNodes.length) b.append(meta);
+    if(d.MEANING) b.append(el("div", "wmean", d.MEANING));
+    if(d.OTHER) b.append(el("div", "muted", "다른 뜻: " + d.OTHER.split(/\s*[;；]\s*/).join(" · ")));
+    if(!done){ b.append(el("div", "muted", "뜻을 찾는 중…")); return; }
+    const row = el("div", "row");
+    if("speechSynthesis" in window){ const sp = el("button", "btn", "🔊"); sp.title = "발음 듣기"; sp.onclick = () => { try{ speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(d.LEMMA || w); const L = L_(lang); if(L.tts) u.lang = L.tts; u.rate = .9; speechSynthesis.speak(u); }catch(e){} }; row.append(sp); }
+    if(gloss && d.MEANING){
+      const g = el("button", "btn", "용어집에 추가");
+      g.onclick = () => { const cd = curDoc(); const line = `${d.LEMMA || w} → ${d.MEANING}`; cd.gloss = ((cd.gloss || "").trim() + "\n" + line).trim(); $("docGloss").value = cd.gloss; saveNow(); g.textContent = "추가했어요"; g.disabled = true; };
+      row.append(g);
+    }
+    b.append(row);
+  }
+  async function showWordCard(w, sent, lang, anchor, gloss){
+    closeCard();
+    if(anchor) anchor.classList.add("on");
+    const c = $("wcard"); c.hidden = false; placeCard(anchor);
+    const key = [lang, set.tgt, w.toLowerCase(), sent].join("|");
+    if(wcache[key]){ paintCard(w, wcache[key], lang, true, gloss); return; }
+    paintCard(w, {}, lang, false, gloss);
+    const me = wcCtl = new AbortController();
+    const prompt = `문장: "${sent}"
+단어: "${w}"
+이 ${langName(lang)} 문장에서 쓰인 단어의 뜻을 ${langName(set.tgt)}로 짧게 설명해. 아래 줄만 이 순서, 이 형식으로 출력해.
+MEANING: 이 문장에서의 뜻 (짧게)
+LEMMA: 사전 기본형
+POS: 품사
+PRON: ${PRON_HINT[lang] || "/IPA 발음기호/"}
+OTHER: 다른 주요 뜻 최대 2개, 세미콜론(;)으로 구분 (없으면 -)`;
+    try{
+      const out = await streamAI(prompt, me.signal, x => { if(me === wcCtl) paintCard(w, parseKV(x), lang, false, gloss); }, 260);
+      if(me !== wcCtl) return;
+      const d = parseKV(out);
+      if(!d.MEANING) throw { code:"empty_completion" };
+      wcache[key] = d;
+      const keys = Object.keys(wcache); if(keys.length > 500) keys.slice(0, keys.length - 500).forEach(k => delete wcache[k]);
+      store.set("tx_wc", wcache);
+      paintCard(w, d, lang, true, gloss);
+    }catch(e){
+      if(e && e.code === "cancelled") return;
+      $("wcBody").append(el("div", "note warn", errMsg(e)));
+    }
+  }
+  $("wcClose").onclick = closeCard;
+  document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("wcard").hidden) closeCard(); });
+  document.addEventListener("pointerdown", e => { if(!$("wcard").hidden && !e.target.closest("#wcard") && !e.target.closest(".w")) closeCard(); });
+  window.addEventListener("resize", () => { if(!$("wcard").hidden) closeCard(); });
+
+  // ---------- viewer: read another text while one is translating ----------
+  let viewing = null;
+  function openViewer(d){
+    viewing = d;
+    const lang = d.lang || detectLang(d.text), L = L_(lang), rows = docRows(d);
+    $("vwTitle").textContent = d.title || "제목 없음";
+    $("vwMeta").textContent = `${langName(lang)} → ${langName(set.tgt)} · 번역 ${rows.filter(r => r.t).length}/${rows.length}문장`;
+    const body = $("vwBody"); body.textContent = "";
+    let last = -1;
+    rows.forEach((r, i) => {
+      const pair = el("div", "pair" + (i > 0 && r.para !== last ? " pstart" : "")); last = r.para;
+      const s = el("div", "src"); s.lang = L.tts || lang; if(L.rtl) s.dir = "rtl";
+      s.append(el("span", "n", String(i + 1))); buildSrc(s, r.s, lang); s.dataset.s = r.s;
+      const t = el("div", "dst"); const tt = el("div", "t" + (r.t ? "" : " empty"), r.t || "번역 전");
+      t.append(tt); pair.append(s, t); body.append(pair);
+    });
+    $("viewer").hidden = false; document.body.classList.add("noscroll");
+    body.scrollTop = 0; $("vwClose").focus();
+  }
+  function closeViewer(){ $("viewer").hidden = true; document.body.classList.remove("noscroll"); viewing = null; closeCard(); }
+  $("vwClose").onclick = closeViewer;
+  $("viewer").addEventListener("click", e => { if(e.target.id === "viewer") closeViewer(); });
+  document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("viewer").hidden && $("wcard").hidden) closeViewer(); });
+  $("vwBody").addEventListener("click", e => {
+    const w = e.target.closest(".w"); if(!w || !viewing || !set.wordTap) return;
+    const src = w.closest(".src");
+    showWordCard(w.dataset.w, src.dataset.s, viewing.lang || detectLang(viewing.text), w, false);
+  });
+  $("vwOpen").onclick = () => {
+    const d = viewing; if(!d) return;
+    if(busyDoc() && busyDoc() !== d.id){ notify("지금 다른 글을 번역하는 중이에요. 번역을 멈춘 뒤에 이 글을 편집할 수 있어요.", { kind:"info", ttl:5000 }); return; }
+    closeViewer(); curId = d.id; saveDocs(); render(); setTab("read"); window.scrollTo({ top:0 });
+  };
+  $("vwSave").onclick = async () => {
+    const d = viewing; if(!d) return;
+    const x = docExport(d, "tr");
+    try{ const n = await saveFileAs(x.name, x.text, x.mime); if(n) notify(`"${n}"(으)로 저장했어요.`, { kind:"ok", ttl:4000 }); }catch(e){ notify("파일로 저장하지 못했어요.", { kind:"info", ttl:4000 }); }
+  };
+
+  // ---------- tabs / input ----------
+  const TABS = [["tabRead","readView","read"],["tabEdit","editView","edit"],["tabLib","libView","lib"]];
+  function setTab(name){
+    TABS.forEach(([t, v, n]) => { $(t).setAttribute("aria-selected", String(n === name)); $(v).hidden = n !== name; });
+    if(name === "edit") updCount();
+    if(name === "lib") renderLib();
+    $("rail").hidden = name !== "read";
+    closeCard();
+  }
+  TABS.forEach(([t, , n]) => { $(t).onclick = () => setTab(n); });
+  function updCount(){
+    const v = $("src").value, lg = $("srcLang").value || (v.trim() ? detectLang(v) : "");
+    const n = v.trim() ? splitSentences(v, lg).length : 0;
+    $("count").textContent = n ? `${langName(lg)} · ${n}문장${$("srcLang").value ? "" : " (자동 감지)"}` : "";
+    $("go").disabled = !v.trim();
+  }
+  $("src").addEventListener("input", updCount);
+  $("srcLang").addEventListener("change", updCount);
+  $("go").onclick = () => {
+    const v = $("src").value.trim(); if(!v) return;
+    addDoc(v, "", "", $("srcLang").value || ""); $("src").value = "";
+    render(); setTab("read"); window.scrollTo({ top:0 });
+  };
+  $("clear").onclick = () => { $("src").value = ""; updCount(); $("src").focus(); };
+  $("src").placeholder = "번역할 글을 붙여 넣으세요. 어떤 언어든 돼요.";
+  // ---------- settings panel ----------
+  let draftProv = cfg.provider;
+  function renderProvs(){
+    const box = $("provs"); box.textContent = "";
+    Object.entries(PROVIDERS).forEach(([id, p]) => {
+      const b = el("button", "prov"); b.setAttribute("aria-pressed", String(id === draftProv));
+      b.append(document.createTextNode(p.name), el("small", "", p.sub));
+      b.onclick = () => { draftProv = id; renderProvs(); fillFields(); };
+      box.append(b);
+    });
+  }
+  function fillFields(){
+    const p = PROVIDERS[draftProv];
+    $("fKey").hidden = p.key === false;
+    $("fModel").hidden = p.model === false;
+    $("fBase").hidden = !p.base;
+    $("fields").hidden = draftProv === "builtin";
+    $("inKey").value = cfg.keys[draftProv] || ""; $("inKey").placeholder = p.keyPh || "";
+    $("inModel").value = cfg.models[draftProv] || ""; $("inModel").placeholder = p.model || "예: meta-llama/llama-3.3-70b-instruct";
+    $("inBase").value = cfg.base || "";
+    $("testOut").textContent = "";
+    const n = $("provNote"); n.classList.remove("warn");
+    if(draftProv === "builtin"){
+      n.textContent = inArtifact ? "claude.ai에 로그인한 사람의 Claude 계정으로 해설을 만들어요. 처음 쓸 때 허용 여부를 한 번 물어봐요." : "claude.ai 페이지에서만 쓸 수 있어요. 여기서는 다른 AI를 골라 주세요.";
+      if(!inArtifact) n.classList.add("warn");
+    } else if(inArtifact){
+      n.textContent = "claude.ai 페이지 안에서는 보안 정책 때문에 외부 AI 호출이 막혀 있어요. 외부 AI는 직접 올린 웹앱이나 PC 프로그램에서 쓸 수 있어요.";
+      n.classList.add("warn");
+    } else {
+      n.textContent = (p.keyUrl ? `키 발급: ${p.keyUrl} · ` : "") + "모델 이름은 비워 두면 기본값" + (p.model ? ` (${p.model})` : "") + "을 써요. 빠른 응답에는 flash·mini·haiku처럼 작은 모델이 좋아요.";
+    }
+  }
+  function saveFields(){
+    cfg.provider = draftProv;
+    if(draftProv !== "builtin"){
+      cfg.keys[draftProv] = $("inKey").value.trim();
+      cfg.models[draftProv] = $("inModel").value.trim();
+      if(draftProv === "compat") cfg.base = $("inBase").value.trim();
+    }
+    store.set("tr_ai", cfg); updateAIButton();
+  }
+  function toggleSettings(open){
+    $("settings").hidden = !open; $("aiBtn").setAttribute("aria-expanded", String(open));
+    if(open){ draftProv = cfg.provider; renderProvs(); fillFields(); }
+  }
+  $("aiBtn").onclick = () => toggleSettings($("settings").hidden);
+  $("saveAI").onclick = () => { saveFields(); toggleSettings(false); };
+  $("testAI").onclick = async () => {
+    saveFields(); const out = $("testOut"); out.textContent = "확인 중…";
+    const t0 = performance.now();
+    try{ await streamAI("Reply with exactly: OK", undefined, null, 20); out.textContent = `연결됐어요 ✓ (응답 ${((performance.now() - t0) / 1000).toFixed(1)}초)`; }
+    catch(e){ out.textContent = errMsg(e); }
+  };
+  // ---------- import from a web address ----------
+  function cleanMarkdown(md){
+    let s = String(md || "");
+    const mc = s.indexOf("Markdown Content:");
+    if(mc >= 0) s = s.slice(mc + "Markdown Content:".length);
+    s = s.replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+         .replace(/\[([^\]]*)\]\((?:[^()]|\([^)]*\))*\)/g, "$1")
+         .replace(/<[^>]+>/g, "")
+         .replace(/^\s{0,3}(#{1,6}|>|\*|-|\+|\d+\.)\s+/gm, "")
+         .replace(/[*_`~]{1,3}/g, "")
+         .replace(/\|/g, " ");
+    const lines = s.split(/\n+/).map(x => x.replace(/\s+/g, " ").trim()).filter(x => {
+      if(!x) return false;
+      if((x.match(/\p{L}/gu) || []).length < 8) return false;
+      if(/^(https?:|www\.)/i.test(x)) return false;
+      if(/cookie|subscribe|sign in|log in|newsletter|advertisement|all rights reserved|©/i.test(x) && x.length < 160) return false;
+      return true;
+    });
+    const seen = new Set();
+    return lines.filter(x => !seen.has(x) && seen.add(x)).join("\n");
+  }
+  function htmlToText(html){
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const title = (doc.querySelector("title") || {}).textContent || "";
+    doc.querySelectorAll("script,style,noscript,nav,header,footer,aside,form,figure,svg,iframe,button").forEach(n => n.remove());
+    const root = doc.querySelector("article") || doc.querySelector("main") || doc.body;
+    if(!root) return { text:"", title };
+    return { text: cleanMarkdown([...root.querySelectorAll("h1,h2,h3,p,li,blockquote")].map(n => n.textContent).join("\n")), title: title.trim() };
+  }
+  async function fetchText(url, timeout){
+    const c = new AbortController(); const t = setTimeout(() => c.abort(), timeout);
+    try{ const r = await fetch(url, { signal:c.signal }); if(!r.ok) throw new Error("HTTP " + r.status); return await r.text(); }
+    finally{ clearTimeout(t); }
+  }
+  async function loadFromURL(){
+    const msg = $("urlMsg"); msg.classList.remove("warn");
+    let u = $("urlIn").value.trim();
+    if(!u){ msg.textContent = "가져올 글의 주소를 넣어 주세요."; msg.classList.add("warn"); return; }
+    if(!/^https?:\/\//i.test(u)) u = "https://" + u;
+    try{ new URL(u); }catch(e){ msg.textContent = "주소 형식이 올바르지 않아요."; msg.classList.add("warn"); return; }
+    if(inArtifact){ msg.textContent = "claude.ai 페이지 안에서는 다른 사이트를 불러올 수 없어요. 직접 올린 웹앱이나 PC 프로그램에서 써 주세요."; msg.classList.add("warn"); return; }
+    const btn = $("urlGo"); btn.disabled = true; msg.textContent = "글을 가져오는 중… (5~15초)";
+    let txt = "", title = "";
+    try{
+      const raw = await fetchText("https://r.jina.ai/" + u, 25000);
+      const tm = raw.match(/^Title:\s*(.+)$/m); if(tm) title = tm[1].trim();
+      txt = cleanMarkdown(raw);
+    }catch(e){}
+    if(txt.length < 80){
+      try{ const r = htmlToText(await fetchText("https://api.allorigins.win/raw?url=" + encodeURIComponent(u), 20000)); txt = r.text; title = title || r.title; }catch(e){}
+    }
+    btn.disabled = false;
+    if(txt.length < 80){
+      msg.textContent = "이 사이트의 글을 가져오지 못했어요. 로그인이 필요한 곳이거나 막아 둔 사이트일 수 있어요. 본문을 복사해서 아래 칸에 붙여 넣어 주세요.";
+      msg.classList.add("warn"); return;
+    }
+    if(txt.length > 30000) txt = txt.slice(0, 30000).replace(/[^.!?]*$/, "");
+    const d = addDoc(txt, title, u, $("srcLang").value || "");
+    msg.textContent = `${langName(d.lang)} 글 ${splitSentences(txt, d.lang).length}문장을 가져와서 글 목록에 추가했어요.`;
+    $("urlIn").value = "";
+    render(); setTab("read"); window.scrollTo({ top:0 });
+  }
+  $("urlGo").onclick = loadFromURL;
+  $("urlIn").addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); loadFromURL(); } });
+  // ---------- document upload (문서 올리기) ----------
+  const CDN = { pdf:"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js", worker:"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js", zip:"https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" };
+  const LOCAL = { pdf:"lib/pdf.min.js", worker:"lib/pdf.worker.min.js", zip:"lib/jszip.min.js" };
+  function loadScript(src){ return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => { s.remove(); rej(new Error("load " + src)); }; document.head.append(s); }); }
+  const libFrom = {};
+  async function need(globalName, key){
+    if(window[globalName]) return window[globalName];
+    if(!inArtifact){ try{ await loadScript(LOCAL[key]); libFrom[key] = "local"; }catch(e){} }
+    if(!window[globalName]){ await loadScript(CDN[key]); libFrom[key] = "cdn"; }
+    if(!window[globalName]) throw new Error("no " + globalName);
+    return window[globalName];
+  }
+  async function needPdf(){
+    const lib = await need("pdfjsLib", "pdf");
+    lib.GlobalWorkerOptions.workerSrc = libFrom.pdf === "local" ? LOCAL.worker : CDN.worker;
+    return lib;
+  }
+  function decodeText(buf){
+    const b = new Uint8Array(buf);
+    if(b[0] === 0xFF && b[1] === 0xFE) return new TextDecoder("utf-16le").decode(buf);
+    if(b[0] === 0xFE && b[1] === 0xFF) return new TextDecoder("utf-16be").decode(buf);
+    try{ return new TextDecoder("utf-8", { fatal:true }).decode(buf); }catch(e){}
+    let best = "", bad = Infinity;
+    for(const enc of ["euc-kr", "shift_jis", "gb18030", "big5", "windows-1252"]){
+      try{ const t = new TextDecoder(enc).decode(buf); const n = (t.match(/\uFFFD/g) || []).length; if(n < bad){ bad = n; best = t; } }catch(e){}
+    }
+    return best;
+  }
+  function plainFromHTML(html){
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    doc.querySelectorAll("script,style,noscript,nav,svg,iframe").forEach(n => n.remove());
+    const blocks = [...doc.querySelectorAll("h1,h2,h3,h4,h5,h6,p,li,blockquote,pre,td")].filter(n => !n.querySelector("p,li,blockquote"));
+    const title = ((doc.querySelector("title") || {}).textContent || "").trim();
+    const text = blocks.length ? blocks.map(n => n.textContent).join("\n") : (doc.body ? doc.body.textContent : "");
+    return { text, title };
+  }
+  // Rejoin PDF lines that were wrapped by the page layout into real paragraphs.
+  function joinLines(lines){
+    const sample = lines.slice(0, 60).join(" ");
+    const tight = !!L_(detectLang(sample)).nospace;
+    const avg = lines.reduce((a, l) => a + l.length, 0) / (lines.length || 1);
+    const out = []; let para = "";
+    lines.forEach(l => {
+      if(para && /[A-Za-z]-$/.test(para) && /^[a-z]/.test(l)) para = para.slice(0, -1) + l;
+      else para = para ? para + (tight ? "" : " ") + l : l;
+      if(/[.!?。！？」』”"')]$/.test(l) && l.length < avg * .85){ out.push(para); para = ""; }
+    });
+    if(para) out.push(para);
+    return out.join("\n");
+  }
+  async function pdfToText(buf, onProg){
+    const lib = await needPdf();
+    const pdf = await lib.getDocument({ data: new Uint8Array(buf) }).promise;
+    const all = [];
+    let title = "";
+    try{ const meta = await pdf.getMetadata(); title = (meta && meta.info && meta.info.Title) || ""; }catch(e){}
+    for(let i = 1; i <= pdf.numPages; i++){
+      const pg = await pdf.getPage(i), tc = await pg.getTextContent();
+      let cur = "", lastY = null;
+      const lines = [];
+      tc.items.forEach(it => {
+        if(!("str" in it)) return;
+        const y = it.transform[5];
+        if(lastY !== null && Math.abs(y - lastY) > 2 && cur){ lines.push(cur); cur = ""; }
+        cur += it.str;
+        if(it.hasEOL){ lines.push(cur); cur = ""; lastY = null; } else lastY = y;
+      });
+      if(cur) lines.push(cur);
+      lines.map(l => l.replace(/\s+/g, " ").trim()).filter(l => l && !/^[-–—\s]*\d+[-–—\s]*$/.test(l)).forEach(l => all.push(l));
+      onProg && onProg(i, pdf.numPages);
+    }
+    return { text: joinLines(all), title, pages: pdf.numPages };
+  }
+  async function docxToText(buf){
+    const JSZip = await need("JSZip", "zip");
+    const z = await JSZip.loadAsync(buf);
+    const f = z.file("word/document.xml"); if(!f) throw new Error("not docx");
+    const doc = new DOMParser().parseFromString(await f.async("string"), "application/xml");
+    const W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+    const text = [...doc.getElementsByTagNameNS(W, "p")].map(p =>
+      [...p.getElementsByTagNameNS(W, "*")].map(n => n.localName === "t" ? n.textContent : n.localName === "tab" ? " " : n.localName === "br" ? "\n" : "").join("")
+    ).filter(s => s.trim()).join("\n");
+    let title = "";
+    try{ const core = z.file("docProps/core.xml"); if(core){ const m = (await core.async("string")).match(/<dc:title>([^<]*)<\/dc:title>/); if(m) title = m[1]; } }catch(e){}
+    return { text, title };
+  }
+  async function epubToText(buf){
+    const JSZip = await need("JSZip", "zip");
+    const z = await JSZip.loadAsync(buf);
+    const cont = await z.file("META-INF/container.xml").async("string");
+    const opfPath = (cont.match(/full-path="([^"]+)"/) || [])[1];
+    const opf = new DOMParser().parseFromString(await z.file(opfPath).async("string"), "application/xml");
+    const base = opfPath.includes("/") ? opfPath.replace(/[^/]+$/, "") : "";
+    const man = {};
+    [...opf.getElementsByTagNameNS("*", "item")].forEach(i => man[i.getAttribute("id")] = i.getAttribute("href"));
+    const order = [...opf.getElementsByTagNameNS("*", "itemref")].map(r => man[r.getAttribute("idref")]).filter(Boolean);
+    const parts = [];
+    for(const h of order){
+      const f = z.file(base + decodeURIComponent(h)) || z.file(base + h); if(!f) continue;
+      const t = plainFromHTML(await f.async("string")).text.trim(); if(t) parts.push(t);
+    }
+    const t = opf.getElementsByTagNameNS("*", "title")[0];
+    return { text: parts.join("\n"), title: t ? t.textContent.trim() : "" };
+  }
+  function subsToText(t){
+    const cues = [];
+    t.replace(/\r/g, "").split(/\n{2,}/).forEach(block => {
+      const lines = block.split("\n").filter(l => l.trim() && !/^\d+$/.test(l.trim()) && !/-->/.test(l) && !/^WEBVTT|^NOTE\b|^STYLE\b/.test(l.trim()));
+      const s = lines.join(" ").replace(/<[^>]+>/g, "").replace(/\{\\[^}]*\}/g, "").replace(/\s+/g, " ").trim();
+      if(s) cues.push(s);
+    });
+    const out = []; let para = "";
+    cues.forEach(c => { para = para ? para + " " + c : c; if(para.length > 400 && /[.!?。！？]["')]?$/.test(c)){ out.push(para); para = ""; } });
+    if(para) out.push(para);
+    return out.join("\n");
+  }
+  const PART = 25000, MAX_PARTS = 40;
+  function splitParts(text){
+    if(text.length <= PART * 1.2) return [text];
+    const parts = []; let cur = "";
+    text.split("\n").forEach(p => {
+      while(p.length > PART){ const cut = p.lastIndexOf(" ", PART) > PART / 2 ? p.lastIndexOf(" ", PART) : PART; if(cur){ parts.push(cur); cur = ""; } parts.push(p.slice(0, cut)); p = p.slice(cut).trim(); }
+      if(cur.length + p.length > PART && cur){ parts.push(cur); cur = ""; }
+      cur += (cur ? "\n" : "") + p;
+    });
+    if(cur) parts.push(cur);
+    return parts;
+  }
+  function tidy(t){ return String(t || "").replace(/\r/g, "").replace(/ /g, " ").replace(/[ \t]+/g, " ").replace(/ *\n */g, "\n").replace(/\n{2,}/g, "\n").trim(); }
+  async function readFile(f, prog){
+    const name = f.name || "문서", ext = (name.match(/\.([a-z0-9]+)$/i) || [, ""])[1].toLowerCase();
+    const base = name.replace(/\.[^.]+$/, "");
+    const buf = await f.arrayBuffer();
+    if(ext === "pdf" || f.type === "application/pdf"){ const r = await pdfToText(buf, (i, n) => prog(`${name} · ${i}/${n}쪽 읽는 중…`)); return { text:r.text, title:r.title || base, pdf:true }; }
+    if(ext === "docx"){ const r = await docxToText(buf); return { text:r.text, title:r.title || base }; }
+    if(ext === "epub"){ const r = await epubToText(buf); return { text:r.text, title:r.title || base }; }
+    const raw = decodeText(buf);
+    if(ext === "srt" || ext === "vtt") return { text: subsToText(raw), title: base };
+    if(ext === "html" || ext === "htm" || /^\s*<(!doctype|html)/i.test(raw)){ const r = plainFromHTML(raw); return { text:r.text, title:r.title || base }; }
+    if(ext === "doc" || ext === "hwp" || ext === "pages") throw { msg:`${name}: 이 형식은 읽을 수 없어요. DOCX나 PDF로 저장해서 올려 주세요.` };
+    return { text: raw.replace(/^#{1,6}\s+/gm, "").replace(/[*_`]{1,3}/g, ""), title: base };
+  }
+  async function handleFiles(list){
+    const files = [...(list || [])]; if(!files.length) return;
+    const msg = $("fileMsg"); msg.classList.remove("warn");
+    const report = []; let firstId = null, added = 0;
+    for(const f of files){
+      try{
+        const r = await readFile(f, t => { msg.textContent = t; });
+        msg.textContent = `${f.name} 정리하는 중…`;
+        let text = tidy(r.text);
+        if((text.match(/\p{L}/gu) || []).length < 20){
+          report.push(r.pdf ? `${f.name}: 글자를 찾지 못했어요. 스캔한 이미지 PDF는 읽을 수 없어요.` : `${f.name}: 읽을 글이 없어요.`);
+          continue;
+        }
+        let parts = splitParts(text), cut = false;
+        if(parts.length > MAX_PARTS){ parts = parts.slice(0, MAX_PARTS); cut = true; }
+        const lang = $("srcLang").value || detectLang(text);
+        const title = String(r.title || f.name).trim().slice(0, 80);
+        for(let i = parts.length - 1; i >= 0; i--){
+          const d = addDoc(parts[i], parts.length > 1 ? `${title} (${i + 1}/${parts.length})` : title, "", lang);
+          d.file = f.name;
+          if(i === 0) firstId = d.id;
+        }
+        added += parts.length;
+        report.push(`${f.name}: ${langName(lang)}${parts.length > 1 ? ` ${parts.length}개로 나눠서` : ""} 추가했어요.` + (cut ? ` 너무 길어서 앞부분 ${MAX_PARTS}개까지만 넣었어요.` : ""));
+      }catch(e){
+        report.push(e && e.msg ? e.msg : `${f.name}: 파일을 읽지 못했어요.` + (/load|no pdfjs|no JSZip/.test(String(e && e.message)) ? " (문서 읽기 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.)" : ""));
+      }
+    }
+    const ok = saveDocs();
+    if(ok === false) report.push("저장 공간이 부족해서 일부를 저장하지 못했을 수 있어요. 글 목록에서 안 쓰는 글을 지워 주세요.");
+    msg.textContent = report.join(" ");
+    msg.classList.toggle("warn", !added);
+    if(firstId){ curId = firstId; saveDocs(); render(); setTab("read"); window.scrollTo({ top:0 }); }
+  }
+  $("fileBtn").onclick = () => $("fileIn").click();
+  $("fileIn").addEventListener("change", e => { const fl = e.target.files; handleFiles(fl).finally(() => { e.target.value = ""; }); });
+  (function(){
+    const z = $("editView");
+    ["dragenter", "dragover"].forEach(t => z.addEventListener(t, e => { if(e.dataTransfer && [...e.dataTransfer.types].includes("Files")){ e.preventDefault(); $("dropZone").classList.add("over"); } }));
+    ["dragleave", "drop"].forEach(t => z.addEventListener(t, e => { if(t === "dragleave" && z.contains(e.relatedTarget)) return; $("dropZone").classList.remove("over"); }));
+    z.addEventListener("drop", e => { if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length){ e.preventDefault(); handleFiles(e.dataTransfer.files); } });
+  })();
+
+
+  // ---------- start ----------
+  updateAIButton(); applyView(); render(); saveDocs();
+  if(!ready()) status("번역하려면 오른쪽 위 ‘설정’에서 AI를 고르고 API 키를 넣어 주세요.", true);
+})();
+</script>
+
+<script>if("serviceWorker" in navigator && location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{});}</script>
+</body>
+</html>
